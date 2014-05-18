@@ -1,0 +1,81 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="create_table_artist" author="kris">
+        <createTable tableName="artist">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(300)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_table_song" author="kris">
+        <createTable tableName="song">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(300)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="artist_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="artist_id"
+                                 baseTableName="song"
+                                 constraintName="fk_song_title"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="artist"/>
+    </changeSet>
+
+    <changeSet id="create_table_chart" author="kris">
+        <createTable tableName="chart">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_table_placement" author="kris">
+        <createTable tableName="placement">
+            <column name="position" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chart_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="song_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="position, chart_id"
+                       constraintName="pk_placement"
+                       tableName="placement" />
+        <addForeignKeyConstraint baseColumnNames="song_id"
+                                 baseTableName="placement"
+                                 constraintName="fk_placement_song"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="song"/>
+        <addForeignKeyConstraint baseColumnNames="chart_id"
+                                 baseTableName="placement"
+                                 constraintName="fk_placement_chart"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="chart"/>
+    </changeSet>
+
+</databaseChangeLog>

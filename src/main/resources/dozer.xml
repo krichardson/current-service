@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <mapping>
+        <class-a>net.krisr.current.domain.ArtistEntity</class-a>
+        <class-b>net.krisr.current.api.Artist</class-b>
+        <field-exclude>
+            <a>metaClass</a>
+            <b>metaClass</b>
+        </field-exclude>
+    </mapping>
+
+    <mapping>
+        <class-a>net.krisr.current.domain.SongEntity</class-a>
+        <class-b>net.krisr.current.api.Song</class-b>
+        <field-exclude>
+            <a>metaClass</a>
+            <b>metaClass</b>
+        </field-exclude>
+    </mapping>
+
+    <mapping>
+        <class-a>net.krisr.current.domain.ChartEntity</class-a>
+        <class-b>net.krisr.current.api.Chart</class-b>
+        <field-exclude>
+            <a>metaClass</a>
+            <b>metaClass</b>
+        </field-exclude>
+    </mapping>
+
+    <mapping>
+        <class-a>net.krisr.current.domain.PlacementEntity</class-a>
+        <class-b>net.krisr.current.api.Placement</class-b>
+        <field-exclude>
+            <a>metaClass</a>
+            <b>metaClass</b>
+        </field-exclude>
+    </mapping>
+
+</mappings>
