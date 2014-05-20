@@ -6,8 +6,8 @@ import org.dozer.Mapper
 
 class ArtistModule {
 
-    Mapper beanMapper
-    ArtistDAO artistDAO
+    private final Mapper beanMapper
+    private final ArtistDAO artistDAO
 
     ArtistModule(Mapper beanMapper, ArtistDAO artistDAO) {
         this.beanMapper = beanMapper

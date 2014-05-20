@@ -78,4 +78,25 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
                                  referencedTableName="chart"/>
     </changeSet>
 
+    <changeSet id="create_table_play" author="kris">
+        <createTable tableName="play">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="song_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="play_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="song_id"
+                                 baseTableName="play"
+                                 constraintName="fk_play_song"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="song"/>
+    </changeSet>
+
 </databaseChangeLog>

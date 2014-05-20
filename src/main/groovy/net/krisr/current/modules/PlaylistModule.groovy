@@ -1,0 +1,142 @@
+package net.krisr.current.modules
+
+import groovy.util.logging.Slf4j
+import net.krisr.current.api.Play
+import net.krisr.current.dao.PlayDAO
+import net.krisr.current.domain.ArtistEntity
+import net.krisr.current.domain.PlayEntity
+import net.krisr.current.domain.SongEntity
+import org.dozer.Mapper
+import org.joda.time.LocalDateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.jsoup.Connection
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.TextNode
+import org.jsoup.select.Elements
+
+@Slf4j
+class PlaylistModule {
+
+    private static final LocalDateTime EARLIEST_START_DATE = new LocalDateTime(2011, 1, 1, 0, 0)
+    private static final int CONNECT_TIMEOUT_MILLIS = 8000
+    private final Mapper beanMapper
+    private final PlayDAO playDAO
+    private final ArtistModule artistModule
+    private final SongModule songModule
+
+    PlaylistModule(Mapper beanMapper, PlayDAO playDAO, ArtistModule artistModule, SongModule songModule) {
+        this.beanMapper = beanMapper
+        this.playDAO = playDAO
+        this.artistModule = artistModule
+        this.songModule = songModule
+    }
+
+    List<Play> importPlaylist() {
+        //Find the last import
+        LocalDateTime lastImport = findLastImportTime() ?: EARLIEST_START_DATE
+        return importPlaylist(lastImport)
+    }
+
+    List<Play> importPlaylist(LocalDateTime startTime) {
+        //Don't do more than a month at a time
+        LocalDateTime endTime = new LocalDateTime()
+        if (startTime.plusMonths(1) < endTime) {
+            endTime = startTime.plusMonths(1)
+        }
+
+        List<PlayEntity> playsImported = []
+        LocalDateTime currentHour = startTime
+        while (currentHour < endTime) {
+            String dataUrl = buildHourUrl(currentHour)
+            log.info("Parsing play data for ${dataUrl}")
+            try {
+                playsImported.addAll parseUrl(dataUrl, currentHour)
+            } catch (IOException e) {
+                log.warn("Unable to get songs for ${dataUrl}: ${e.message}")
+            }
+
+            currentHour = currentHour.plusHours(1)
+        }
+        //Map to TOs and return
+        return playsImported.collect { beanMapper.map(it, Play) }
+    }
+
+    List<PlayEntity> parseUrl(String url, LocalDateTime currentHour) {
+        Connection connection = Jsoup.connect(url).timeout(CONNECT_TIMEOUT_MILLIS)
+        Document doc = connection.get()
+        return parseDocument(doc, currentHour)
+    }
+
+    List<PlayEntity> parseHtml(String html, LocalDateTime currentHour) {
+        Document doc = Jsoup.parse(html)
+        return parseDocument(doc, currentHour)
+    }
+
+    private List<PlayEntity> parseDocument(Document doc, LocalDateTime currentHour) {
+        Elements songRows = doc.select('article.song')
+        if (songRows.size() == 1 && songRows.html().contains('No playlist data available for this hour.')) {
+            log.info("There are no songs available ${currentHour}.")
+            return []
+        }
+
+        List<PlayEntity> parsedPlays = []
+        ListIterator<Element> iterator = songRows.listIterator()
+        DateTimeFormatter formatter = DateTimeFormat.forPattern('yyyy-MM-dd H:mm')
+        while (iterator.hasNext()) {
+            Element row = iterator.next()
+
+            //Artist
+            Element artist = row.select('div h5.artist')[0]
+            String artistName = elementValue(artist)
+
+            //Song Title
+            Element song = row.select('div h5.title')[0]
+            String songTitle = elementValue(song)
+
+            //Date/Time
+            Element dateTime = row.select('div.songTime time')[0]
+            String dateString = elementAttributeValue(dateTime, 'datetime')
+            String timeString = elementValue(dateTime)
+
+            //The parsed time is 12 hour format, so need to set the correct 24 hour hour
+            LocalDateTime playTime = LocalDateTime.parse(dateString + ' ' + timeString, formatter)
+            playTime = playTime.withHourOfDay(currentHour.hourOfDay)
+
+            //Save the stuff
+            SongEntity songEntity = getOrCreateSong(artistName, songTitle)
+            PlayEntity playEntity = new PlayEntity(song: songEntity, playTime: playTime)
+            playDAO.createOrUpdate(playEntity)
+            parsedPlays << playEntity
+        }
+        return parsedPlays
+    }
+
+    private SongEntity getOrCreateSong(String artistName, String songTitle) {
+        ArtistEntity artist = artistModule.findOrCreateArtist(artistName)
+        SongEntity song = songModule.findOrCreateSong(artist, songTitle)
+        return song
+    }
+
+    private String buildHourUrl(LocalDateTime hour) {
+        return 'http://www.thecurrent.org/playlist/' +
+                hour.toString('yyyy-MM-dd') + '/' + hour.toString('H') +
+                '?isajax=1'
+    }
+
+    private LocalDateTime findLastImportTime() {
+        return playDAO.findLastImportTime()
+    }
+
+    private static String elementValue(Element element) {
+        def childNode = element.childNodes()[0]
+        return (childNode instanceof TextNode) ? childNode.text().trim() : null
+    }
+
+    private static String elementAttributeValue(Element element, String attributeName) {
+        return element.attr(attributeName).trim()
+    }
+
+}

@@ -9,17 +9,22 @@ import com.yammer.dropwizard.db.DatabaseConfiguration
 import com.yammer.dropwizard.hibernate.HibernateBundle
 import com.yammer.dropwizard.hibernate.SessionFactoryFactory
 import com.yammer.dropwizard.migrations.MigrationsBundle
+import com.yammer.dropwizard.tasks.Task
 import net.krisr.current.dao.ArtistDAO
 import net.krisr.current.dao.ChartDAO
+import net.krisr.current.dao.PlayDAO
 import net.krisr.current.dao.SongDAO
 import net.krisr.current.domain.ArtistEntity
 import net.krisr.current.domain.ChartEntity
 import net.krisr.current.domain.PlacementEntity
+import net.krisr.current.domain.PlayEntity
 import net.krisr.current.domain.SongEntity
 import net.krisr.current.modules.ArtistModule
 import net.krisr.current.modules.ChartModule
+import net.krisr.current.modules.PlaylistModule
 import net.krisr.current.modules.SongModule
 import net.krisr.current.resources.ChartResource
+import net.krisr.current.tasks.PlaylistTask
 import org.dozer.DozerBeanMapper
 import org.dozer.Mapper
 
@@ -29,7 +34,7 @@ class CurrentService extends Service<CurrentConfiguration> {
     }
 
     public static final List<Class<?>> SERVICE_ENTITIES = [
-            ArtistEntity, ChartEntity, PlacementEntity, SongEntity
+            ArtistEntity, ChartEntity, PlacementEntity, SongEntity, PlayEntity
     ]
 
     HibernateBundle<CurrentConfiguration> hibernateBundle =
@@ -54,17 +59,29 @@ class CurrentService extends Service<CurrentConfiguration> {
 
     void addResources(CurrentConfiguration configuration, Environment environment) {
 
-        Mapper beanMapper = new DozerBeanMapper(['dozer.xml']);
+        Mapper beanMapper = new DozerBeanMapper(['dozer.xml'])
 
+        //DOAs
         ArtistDAO artistDAO = new ArtistDAO(hibernateBundle.sessionFactory)
         SongDAO songDAO = new SongDAO(hibernateBundle.sessionFactory)
         ChartDAO chartDAO = new ChartDAO(hibernateBundle.sessionFactory)
+        PlayDAO playDAO = new PlayDAO(hibernateBundle.sessionFactory)
 
+        //Modules
         ArtistModule artistModule = new ArtistModule(beanMapper, artistDAO)
         SongModule songModule = new SongModule(beanMapper, songDAO)
         ChartModule chartModule = new ChartModule(beanMapper, chartDAO, artistModule, songModule)
+        PlaylistModule playlistModule = new PlaylistModule(beanMapper, playDAO, artistModule, songModule)
+
+        //Tasks
+        Task playlistTask = new PlaylistTask(hibernateBundle.sessionFactory, playlistModule)
 
         environment.addResource(new ChartResource(chartModule))
+        environment.addTask(playlistTask)
+    }
+
+    void addTasks(CurrentConfiguration configuration, Environment environment) {
+
     }
 
     @Override
@@ -79,6 +96,7 @@ class CurrentService extends Service<CurrentConfiguration> {
     @Override
     public void run(CurrentConfiguration configuration,
                     Environment environment) throws ClassNotFoundException {
+        addTasks(configuration, environment)
         addResources(configuration, environment)
     }
 }

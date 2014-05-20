@@ -40,4 +40,13 @@
         </field-exclude>
     </mapping>
 
+    <mapping>
+        <class-a>net.krisr.current.domain.PlayEntity</class-a>
+        <class-b>net.krisr.current.api.Play</class-b>
+        <field-exclude>
+            <a>metaClass</a>
+            <b>metaClass</b>
+        </field-exclude>
+    </mapping>
+
 </mappings>

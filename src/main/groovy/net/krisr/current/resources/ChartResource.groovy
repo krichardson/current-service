@@ -2,11 +2,9 @@ package net.krisr.current.resources
 
 import com.yammer.dropwizard.hibernate.UnitOfWork
 import com.yammer.dropwizard.jersey.params.DateTimeParam
-import com.yammer.dropwizard.jersey.params.IntParam
 import com.yammer.dropwizard.jersey.params.LongParam
 import com.yammer.metrics.annotation.Timed
 import net.krisr.current.api.Chart
-import net.krisr.current.domain.ChartEntity
 import net.krisr.current.modules.ChartModule
 
 import javax.ws.rs.GET

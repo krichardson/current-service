@@ -8,6 +8,7 @@ import net.krisr.current.domain.PlacementEntity
 import net.krisr.current.domain.SongEntity
 import org.dozer.Mapper
 import org.joda.time.LocalDate
+import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.TextNode
@@ -16,10 +17,11 @@ import org.jsoup.nodes.Element
 
 class ChartModule {
 
-    Mapper beanMapper
-    ChartDAO chartDAO
-    ArtistModule artistModule
-    SongModule songModule
+    private static final int CONNECT_TIMEOUT_MILLIS = 8000
+    private final Mapper beanMapper
+    private final ChartDAO chartDAO
+    private final ArtistModule artistModule
+    private final SongModule songModule
 
     ChartModule(Mapper beanMapper, ChartDAO chartDAO, ArtistModule artistModule, SongModule songModule) {
         this.beanMapper = beanMapper
@@ -34,19 +36,16 @@ class ChartModule {
     }
 
     Chart parseUrl(String chartUrl, LocalDate chartDate) {
-
-        Document doc = Jsoup.connect(chartUrl).get()
+        Connection connection = Jsoup.connect(chartUrl).timeout(CONNECT_TIMEOUT_MILLIS)
+        Document doc = connection.get()
         ChartEntity chartEntity = parseDocument(doc, chartDate)
         return beanMapper.map(chartEntity, Chart)
-
     }
 
     Chart parseHtml(String html, LocalDate chartDate) {
-
         Document doc = Jsoup.parse(html)
         ChartEntity chartEntity = parseDocument(doc, chartDate)
         return beanMapper.map(chartEntity, Chart)
-
     }
 
     private ChartEntity parseDocument(Document doc, LocalDate chartDate) {
@@ -78,6 +77,7 @@ class ChartModule {
             ArtistEntity artist = artistModule.findOrCreateArtist(it.artist)
             SongEntity song = songModule.findOrCreateSong(artist, it.title)
             PlacementEntity placement = new PlacementEntity(chart: chart, position: it.position, song: song)
+            chartDAO.createPlacement(placement)
             return placement
         }
         chartDAO.createOrUpdate(chart)
@@ -94,11 +94,9 @@ class ChartModule {
         return chartEntity
     }
 
-
-
     private static String tdValue(Element element) {
         def childNode = element.childNodes()[0]
-        return (childNode instanceof TextNode) ? childNode.text() : null
+        return (childNode instanceof TextNode) ? childNode.text().trim() : null
     }
 
 }

@@ -7,8 +7,8 @@ import org.dozer.Mapper
 
 class SongModule {
 
-    Mapper beanMapper
-    SongDAO songDAO
+    private final Mapper beanMapper
+    private final SongDAO songDAO
 
     SongModule(Mapper beanMapper, SongDAO songDAO) {
         this.beanMapper = beanMapper
