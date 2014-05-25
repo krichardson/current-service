@@ -99,4 +99,11 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
                                  referencedTableName="song"/>
     </changeSet>
 
+
+    <changeSet id="unique_chart_date" author="kris">
+        <addUniqueConstraint constraintName="unique_chart_date" tableName="chart" columnNames="date"/>
+    </changeSet>
+
+
+
 </databaseChangeLog>

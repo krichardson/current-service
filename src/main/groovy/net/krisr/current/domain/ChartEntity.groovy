@@ -25,7 +25,7 @@ class ChartEntity {
     @NotNull
     LocalDate date
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = 'chart')
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = 'chart')
     List<PlacementEntity> placements
 
 }
