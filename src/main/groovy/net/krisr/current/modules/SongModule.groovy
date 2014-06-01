@@ -1,27 +1,24 @@
 package net.krisr.current.modules
 
+import net.krisr.current.api.Artist
+import net.krisr.current.api.Song
 import net.krisr.current.dao.SongDAO
-import net.krisr.current.domain.ArtistEntity
-import net.krisr.current.domain.SongEntity
-import org.dozer.Mapper
 
 class SongModule {
 
-    private final Mapper beanMapper
     private final SongDAO songDAO
 
-    SongModule(Mapper beanMapper, SongDAO songDAO) {
-        this.beanMapper = beanMapper
+    SongModule(SongDAO songDAO) {
         this.songDAO = songDAO
     }
 
-    protected SongEntity findOrCreateSong(ArtistEntity artistEntity, String title) {
-        SongEntity songEntity = songDAO.findByArtistAndTitle(artistEntity, title)
-        if (!songEntity) {
-            songEntity = new SongEntity(artist: artistEntity, title: title)
-            songDAO.createOrUpdate(songEntity)
+    protected Song findOrCreateSong(Artist artist, String title) {
+        Song song = songDAO.findByArtistAndTitle(artist.id, title)
+        if (!song) {
+            song = new Song(artist: artist, title: title)
+            song.id = songDAO.create(title, artist.id)
         }
-        return songEntity
+        return song
     }
 
 }

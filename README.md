@@ -13,29 +13,31 @@ show results
 2. Play list: Collect all the playlist data (artist/title/date) and
 make it reportable
 
-# Running The Application
+# Testing, Running and Debugging the Application
 
-To test the example application run the following commands.
+* To run the tests run:
 
-* To run the tests run
+        `gradle test`
 
-`gradle test`
-
-* To package the example run.
+* To package the service run:
 
         gradle shadowJar
 
-* To drop an existing h2 database run.
+* To drop an existing database run:
 
         gradle dropAll
 
-* To setup the h2 database run.
+* To setup the postgres database run:
 
         gradle migrate
 
-* To run the server run.
+* To run the server run:
 
         gradle run
+        
+* To debug the server run:
+        
+        gradle debug
 
 
 

@@ -1,29 +1,27 @@
 package net.krisr.current.modules
 
+import net.krisr.current.api.Artist
 import net.krisr.current.api.Chart
+import net.krisr.current.api.Song
 import net.krisr.current.dao.ChartDAO
-import net.krisr.current.domain.ArtistEntity
-import net.krisr.current.domain.ChartEntity
-import net.krisr.current.domain.SongEntity
-import org.dozer.DozerBeanMapper
-import org.dozer.Mapper
+import net.krisr.current.dao.PlacementDAO
 import org.joda.time.LocalDate
 import spock.lang.Specification
 
 class ChartModuleSpec extends Specification {
 
     ChartModule chartModule
-    Mapper beanMapper
     ChartDAO chartDAO
+    PlacementDAO placementDAO
     ArtistModule artistModule
     SongModule songModule
 
     def setup() {
-        beanMapper = new DozerBeanMapper(['dozer.xml'])
         chartDAO = Mock()
+        placementDAO = Mock()
         artistModule = Mock()
         songModule = Mock()
-        chartModule = new ChartModule(beanMapper, chartDAO, artistModule, songModule)
+        chartModule = new ChartModule(chartDAO, placementDAO, artistModule, songModule)
     }
 
     def 'parse some placements out of chart html'() {
@@ -38,13 +36,13 @@ class ChartModuleSpec extends Specification {
         then: 'Chart is created'
         (1..20).each { int id ->
             artistModule.findOrCreateArtist(_ as String) >> {
-                new ArtistEntity(id: id, name: it)
+                new Artist(id: id, name: it)
             }
-            songModule.findOrCreateSong(_ as ArtistEntity, _ as String) >> { ArtistEntity artist, String title ->
-                new SongEntity(id: id, artist: artist, title: title)
+            songModule.findOrCreateSong(_ as Artist, _ as String) >> { Artist artist, String title ->
+                new Song(id: id, artist: artist, title: title)
             }
         }
-        2 * chartDAO.createOrUpdate(_ as ChartEntity)
+        2 * chartDAO.create(chartDate)
 
         assert chart.date == chartDate
 

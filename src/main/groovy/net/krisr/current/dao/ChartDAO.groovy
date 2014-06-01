@@ -1,32 +1,37 @@
 package net.krisr.current.dao
 
-import net.krisr.current.domain.ChartEntity
-import net.krisr.current.domain.PlacementEntity
-import org.hibernate.SessionFactory
-import org.hibernate.criterion.Restrictions
+import net.krisr.current.api.Chart
 import org.joda.time.LocalDate
+import org.skife.jdbi.v2.sqlobject.Bind
+import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys
+import org.skife.jdbi.v2.sqlobject.SqlQuery
+import org.skife.jdbi.v2.sqlobject.SqlUpdate
+import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper
 
-class ChartDAO extends AbstractDAO<ChartEntity> {
+@RegisterMapper(ChartMapper)
+interface ChartDAO {
 
-    private final PlacementDAO placementDAO
+    @SqlQuery('select id as chart_id, date as chart_date from chart order by date desc')
+    List<Chart> findAll()
 
-    ChartDAO(SessionFactory sessionFactory) {
-        super(sessionFactory)
-        placementDAO = new PlacementDAO(sessionFactory)
-    }
+    @SqlQuery('''
+        select c.id as chart_id, c.date as chart_date
+        from chart c
+        where c.id = :id
+        ''')
+    Chart findById(@Bind('id') Long id)
 
-    ChartEntity findById(Long id) {
-        return get(id)
-    }
+    @SqlQuery('''
+        select c.id as chart_id, c.date as chart_date
+        from chart c
+        where c.date = :date
+        ''')
+    Chart findByDate(@Bind('date') LocalDate date)
 
-    ChartEntity findByDate(LocalDate date) {
-        return criteria()
-                    .add(Restrictions.eq('date', date))
-                    .uniqueResult() as ChartEntity
-    }
+    @SqlUpdate('insert into chart (date) values (:date)')
+    @GetGeneratedKeys
+    Long create(@Bind('date') LocalDate date)
 
-    PlacementEntity createPlacement(PlacementEntity placementEntity) {
-        return placementDAO.createOrUpdate(placementEntity)
-    }
-
+    @SqlUpdate('update chart set date = :date where id = :id')
+    void update(@Bind('id') Long id, @Bind('date') LocalDate date)
 }

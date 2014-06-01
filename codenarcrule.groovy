@@ -1,5 +1,5 @@
 ruleset {
-    description 'Bloom Health CodeNarc Rules'
+    description 'Codenarc Rules'
 
     ruleset('rulesets/basic.xml') {
         'EmptyMethod' enabled: false

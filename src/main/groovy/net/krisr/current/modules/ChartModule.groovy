@@ -1,12 +1,12 @@
 package net.krisr.current.modules
 
+import net.krisr.current.api.Artist
 import net.krisr.current.api.Chart
+import net.krisr.current.api.Placement
+import net.krisr.current.api.Song
 import net.krisr.current.dao.ChartDAO
-import net.krisr.current.domain.ArtistEntity
-import net.krisr.current.domain.ChartEntity
-import net.krisr.current.domain.PlacementEntity
-import net.krisr.current.domain.SongEntity
-import org.dozer.Mapper
+import net.krisr.current.dao.PlacementDAO
+
 import org.joda.time.LocalDate
 import org.jsoup.Connection
 import org.jsoup.Jsoup
@@ -18,39 +18,47 @@ import org.jsoup.nodes.Element
 class ChartModule {
 
     private static final int CONNECT_TIMEOUT_MILLIS = 8000
-    private final Mapper beanMapper
     private final ChartDAO chartDAO
+    private final PlacementDAO placementDAO
     private final ArtistModule artistModule
     private final SongModule songModule
 
-    ChartModule(Mapper beanMapper, ChartDAO chartDAO, ArtistModule artistModule, SongModule songModule) {
-        this.beanMapper = beanMapper
+    ChartModule(ChartDAO chartDAO,
+                PlacementDAO placementDAO,
+                ArtistModule artistModule,
+                SongModule songModule) {
         this.chartDAO = chartDAO
+        this.placementDAO = placementDAO
         this.artistModule = artistModule
         this.songModule = songModule
     }
 
+    List<Chart> getAllCharts() {
+        return chartDAO.findAll()
+    }
+
     Chart getChart(Long id) {
-       ChartEntity chartEntity = chartDAO.findById(id)
-        return beanMapper.map(chartEntity, Chart)
+        Chart chart = chartDAO.findById(id)
+        if (chart) {
+            chart.placements = placementDAO.findAllByChartId(chart.id)
+        }
+       return chart
     }
 
     Chart parseUrl(String chartUrl, LocalDate chartDate) {
         Connection connection = Jsoup.connect(chartUrl).timeout(CONNECT_TIMEOUT_MILLIS)
         Document doc = connection.get()
-        ChartEntity chartEntity = parseDocument(doc, chartDate)
-        return beanMapper.map(chartEntity, Chart)
+        return parseDocument(doc, chartDate)
     }
 
     Chart parseHtml(String html, LocalDate chartDate) {
         Document doc = Jsoup.parse(html)
-        ChartEntity chartEntity = parseDocument(doc, chartDate)
-        return beanMapper.map(chartEntity, Chart)
+        return parseDocument(doc, chartDate)
     }
 
-    private ChartEntity parseDocument(Document doc, LocalDate chartDate) {
+    private Chart parseDocument(Document doc, LocalDate chartDate) {
 
-        ChartEntity chart = findOrCreateChart(chartDate)
+        Chart chart = findOrCreateChart(chartDate)
 
         //If the chart already exists w/ placements, then skip updating
         if (chart.placements) {
@@ -74,24 +82,24 @@ class ChartModule {
         }
 
         chart.placements = foundSongs.collect {
-            ArtistEntity artist = artistModule.findOrCreateArtist(it.artist)
-            SongEntity song = songModule.findOrCreateSong(artist, it.title)
-            PlacementEntity placement = new PlacementEntity(chart: chart, position: it.position, song: song)
-            chartDAO.createPlacement(placement)
+            Artist artist = artistModule.findOrCreateArtist(it.artist)
+            Song song = songModule.findOrCreateSong(artist, it.title)
+            Placement placement = new Placement(position: it.position, song: song)
+            placementDAO.create(chart.id, it.position, song.id)
             return placement
         }
-        chartDAO.createOrUpdate(chart)
-
         return chart
     }
 
-    private ChartEntity findOrCreateChart(LocalDate chartDate) {
-        ChartEntity chartEntity = chartDAO.findByDate(chartDate)
-        if (!chartEntity) {
-            chartEntity = new ChartEntity(date: chartDate)
-            chartDAO.createOrUpdate(chartEntity)
+    private Chart findOrCreateChart(LocalDate chartDate) {
+        Chart chart = chartDAO.findByDate(chartDate)
+        if (chart) {
+            chart.placements = placementDAO.findAllByChartId(chart.id)
+        } else {
+            chart = new Chart(date: chartDate, placements: [])
+            chart.id = chartDAO.create(chartDate)
         }
-        return chartEntity
+        return chart
     }
 
     private static String tdValue(Element element) {

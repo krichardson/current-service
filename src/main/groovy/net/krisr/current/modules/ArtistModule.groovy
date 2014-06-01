@@ -1,25 +1,22 @@
 package net.krisr.current.modules
 
+import net.krisr.current.api.Artist
 import net.krisr.current.dao.ArtistDAO
-import net.krisr.current.domain.ArtistEntity
-import org.dozer.Mapper
 
 class ArtistModule {
 
-    private final Mapper beanMapper
     private final ArtistDAO artistDAO
 
-    ArtistModule(Mapper beanMapper, ArtistDAO artistDAO) {
-        this.beanMapper = beanMapper
+    ArtistModule(ArtistDAO artistDAO) {
         this.artistDAO = artistDAO
     }
 
-    protected findOrCreateArtist(String name) {
-        ArtistEntity artistEntity = artistDAO.findByName(name)
-        if (!artistEntity) {
-            artistEntity = new ArtistEntity(name: name)
-            artistDAO.createOrUpdate(artistEntity)
+    protected Artist findOrCreateArtist(String name) {
+        Artist artist = artistDAO.findByName(name)
+        if (!artist) {
+            artist = new Artist(name: name)
+            artist.id = artistDAO.create(name)
         }
-        return artistEntity
+        return artist
     }
 }

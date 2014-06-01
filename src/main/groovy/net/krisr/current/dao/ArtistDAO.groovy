@@ -1,17 +1,26 @@
 package net.krisr.current.dao
 
-import net.krisr.current.domain.ArtistEntity
-import org.hibernate.SessionFactory
-import org.hibernate.criterion.Restrictions
+import net.krisr.current.api.Artist
+import org.skife.jdbi.v2.sqlobject.Bind
+import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys
+import org.skife.jdbi.v2.sqlobject.SqlQuery
+import org.skife.jdbi.v2.sqlobject.SqlUpdate
+import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper
 
-class ArtistDAO extends AbstractDAO<ArtistEntity> {
+@RegisterMapper(ArtistMapper)
+interface ArtistDAO {
 
-    ArtistDAO(SessionFactory sessionFactory) {
-        super(sessionFactory)
-    }
+    @SqlQuery('select id as artist_id, name as artist_name from where id = :id')
+    Artist findById(@Bind('id') Long id)
 
-    ArtistEntity findByName(String name) {
-        return criteria().add(Restrictions.eq('name', name)).uniqueResult() as ArtistEntity
-    }
+    @SqlQuery('select id as artist_id, name as artist_name from artist where name = :name')
+    Artist findByName(@Bind('name') String name)
+
+    @SqlUpdate('insert into artist (name) values (:name)')
+    @GetGeneratedKeys
+    Long create(@Bind('name') String name)
+
+    @SqlUpdate('update artist set name = :name where id = :id')
+    void update(@Bind('id') Long id, @Bind('name') String name)
 
 }
