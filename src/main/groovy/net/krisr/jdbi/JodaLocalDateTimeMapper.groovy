@@ -5,6 +5,7 @@ import org.skife.jdbi.v2.util.TypedMapper
 
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.sql.Timestamp
 
 /**
  * A {@link TypedMapper} to map Joda {@link LocalDateTime} objects.
@@ -13,12 +14,20 @@ public class JodaLocalDateTimeMapper extends TypedMapper<LocalDateTime> {
 
     @Override
     protected LocalDateTime extractByName(final ResultSet r, final String name) throws SQLException {
-        return new LocalDateTime(r.getTimestamp(name).time)
+        Timestamp timestamp = r.getTimestamp(name)
+        if (timestamp) {
+            return new LocalDateTime(timestamp.time)
+        }
+        return null
     }
 
     @Override
     protected LocalDateTime extractByIndex(final ResultSet r, final int index) throws SQLException {
-        return new LocalDateTime(r.getTimestamp(index).time)
+        Timestamp timestamp = r.getTimestamp(index)
+        if (timestamp) {
+            return new LocalDateTime(timestamp.time)
+        }
+        return null
     }
 }
 

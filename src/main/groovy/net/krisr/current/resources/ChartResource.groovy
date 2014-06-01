@@ -38,7 +38,7 @@ class ChartResource {
     Chart importChart(@Valid ChartImportRequest request) {
         String chartUrl = request.chartUrl
         LocalDate chartDate = request.chartDate
-        Chart chart = chartModule.parseUrl(chartUrl, chartDate.get().toLocalDate())
+        Chart chart = chartModule.parseUrl(chartUrl, chartDate)
         if (!chart) {
             throw new WebApplicationException(Response.Status.NOT_FOUND)
         }

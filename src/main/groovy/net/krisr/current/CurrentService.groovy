@@ -2,6 +2,7 @@ package net.krisr.current
 
 import io.dropwizard.Application
 import io.dropwizard.db.DataSourceFactory
+import io.dropwizard.servlets.tasks.Task
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
 import io.dropwizard.jdbi.DBIFactory
@@ -16,6 +17,7 @@ import net.krisr.current.modules.ChartModule
 import net.krisr.current.modules.PlaylistModule
 import net.krisr.current.modules.SongModule
 import net.krisr.current.resources.ChartResource
+import net.krisr.current.tasks.PlaylistTask
 import net.krisr.jdbi.JodaLocalDateArgumentFactory
 import net.krisr.jdbi.JodaLocalDateMapper
 import net.krisr.jdbi.JodaLocalDateTimeArgumentFactory
@@ -58,18 +60,18 @@ class CurrentService extends Application<CurrentConfiguration> {
         SongDAO songDAO = jdbi.onDemand(SongDAO)
         ChartDAO chartDAO = jdbi.onDemand(ChartDAO)
         PlacementDAO placementDAO = jdbi.onDemand(PlacementDAO)
-        //PlayDAO playDAO = jdbi.onDemand(PlayDAO)
+        PlayDAO playDAO = jdbi.onDemand(PlayDAO)
 
         //Modules
         ArtistModule artistModule = new ArtistModule(artistDAO)
         SongModule songModule = new SongModule(songDAO)
         ChartModule chartModule = new ChartModule(chartDAO, placementDAO, artistModule, songModule)
-        //PlaylistModule playlistModule = new PlaylistModule(playDAO, artistModule, songModule)
+        PlaylistModule playlistModule = new PlaylistModule(playDAO, artistModule, songModule)
 
         //Tasks
-        //Task playlistTask = new PlaylistTask(hibernateBundle.sessionFactory, playlistModule)
+        Task playlistTask = new PlaylistTask(playlistModule)
 
         environment.jersey().register(new ChartResource(chartModule))
-        //environment.admin().addTask(playlistTask)
+        environment.admin().addTask(playlistTask)
     }
 }

@@ -34,7 +34,8 @@ class PlaylistModule {
     List<Play> importPlaylist() {
         //Find the last import
         LocalDateTime lastImport = findLastImportTime() ?: EARLIEST_START_DATE
-        return importPlaylist(lastImport)
+        //Add a second, so we don't try to re-import the last song
+        return importPlaylist(lastImport.plusSeconds(1))
     }
 
     List<Play> importPlaylist(LocalDateTime startTime) {
@@ -54,10 +55,13 @@ class PlaylistModule {
             } catch (IOException e) {
                 log.warn("Unable to get songs for ${dataUrl}: ${e.message}")
             }
-
-            currentHour = currentHour.plusHours(1)
+            //For any non-first hour, set to the start of the hour
+            currentHour = currentHour
+                    .plusHours(1)
+                    .withMinuteOfHour(0)
+                    .withSecondOfMinute(0)
+                    .withMillisOfSecond(0)
         }
-        //Map to TOs and return
         return playsImported
     }
 
@@ -72,10 +76,10 @@ class PlaylistModule {
         return parseDocument(doc, currentHour)
     }
 
-    private List<Play> parseDocument(Document doc, LocalDateTime currentHour) {
+    private List<Play> parseDocument(Document doc, LocalDateTime currentHourStart) {
         Elements songRows = doc.select('article.song')
         if (songRows.size() == 1 && songRows.html().contains('No playlist data available for this hour.')) {
-            log.info("There are no songs available ${currentHour}.")
+            log.info("There are no songs available ${currentHourStart}.")
             return []
         }
 
@@ -100,13 +104,15 @@ class PlaylistModule {
 
             //The parsed time is 12 hour format, so need to set the correct 24 hour hour
             LocalDateTime playTime = LocalDateTime.parse(dateString + ' ' + timeString, formatter)
-            playTime = playTime.withHourOfDay(currentHour.hourOfDay)
+            playTime = playTime.withHourOfDay(currentHourStart.hourOfDay)
 
             //Save the stuff
-            Song song = getOrCreateSong(artistName, songTitle)
-            Play play = new Play(song: song, playTime: playTime)
-            play.id = playDAO.create(playTime, song.id)
-            parsedPlays << play
+            if (playTime >= currentHourStart) {
+                Song song = getOrCreateSong(artistName, songTitle)
+                Play play = new Play(song: song, playTime: playTime)
+                play.id = playDAO.create(playTime, song.id)
+                parsedPlays << play
+            }
         }
         return parsedPlays
     }
@@ -124,9 +130,7 @@ class PlaylistModule {
     }
 
     private LocalDateTime findLastImportTime() {
-        //TODO
-        //return playDAO.findLastImportTime()
-        return null
+        return playDAO.findLatestPlayTime()
     }
 
     private static String elementValue(Element element) {

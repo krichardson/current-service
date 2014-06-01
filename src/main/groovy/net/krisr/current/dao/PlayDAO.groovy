@@ -24,6 +24,10 @@ interface PlayDAO {
     ''')
     Play findById(@Bind('id') Long id)
 
+    @SqlQuery('select max(play_time) as latest_play_time from play')
+    LocalDateTime findLatestPlayTime()
+
+
     @SqlUpdate('insert into play (play_time, song_id) values (:playTime, :songId)')
     @GetGeneratedKeys
     Long create(@Bind('playTime') LocalDateTime playTime,

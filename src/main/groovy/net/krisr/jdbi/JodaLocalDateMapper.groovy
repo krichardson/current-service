@@ -13,11 +13,19 @@ public class JodaLocalDateMapper extends TypedMapper<LocalDate> {
 
     @Override
     protected LocalDate extractByName(final ResultSet r, final String name) throws SQLException {
-        return new LocalDate(r.getDate(name))
+        Date date = r.getDate(name)
+        if (date) {
+            return new LocalDate(date)
+        }
+        return null
     }
 
     @Override
     protected LocalDate extractByIndex(final ResultSet r, final int index) throws SQLException {
-        return new LocalDate(r.getDate(index))
+        Date date = r.getDate(index)
+        if (date) {
+            return new LocalDate(date)
+        }
+        return null
     }
 }
