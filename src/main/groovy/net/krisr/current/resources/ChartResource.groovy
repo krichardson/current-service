@@ -17,7 +17,7 @@ import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
-@Path('/chart')
+@Path('/charts')
 @Produces(MediaType.APPLICATION_JSON)
 class ChartResource {
 
