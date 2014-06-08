@@ -16,6 +16,7 @@ import net.krisr.current.modules.ArtistModule
 import net.krisr.current.modules.ChartModule
 import net.krisr.current.modules.PlaylistModule
 import net.krisr.current.modules.SongModule
+import net.krisr.current.resources.ArtistResource
 import net.krisr.current.resources.ChartResource
 import net.krisr.current.tasks.PlaylistTask
 import net.krisr.jdbi.JodaLocalDateArgumentFactory
@@ -72,6 +73,7 @@ class CurrentService extends Application<CurrentConfiguration> {
         Task playlistTask = new PlaylistTask(playlistModule)
 
         environment.jersey().register(new ChartResource(chartModule))
+        environment.jersey().register(new ArtistResource(artistModule))
         environment.admin().addTask(playlistTask)
     }
 }

@@ -11,6 +11,18 @@ class ArtistModule {
         this.artistDAO = artistDAO
     }
 
+    List<Artist> listArtists(Integer limit = 50, Integer offset = 0) {
+        return artistDAO.listArtists(limit, offset)
+    }
+
+    Artist findById(Long id) {
+        return artistDAO.findById(id)
+    }
+
+    Artist findByName(String name) {
+        return artistDAO.findByName(name)
+    }
+
     protected Artist findOrCreateArtist(String name) {
         Artist artist = artistDAO.findByName(name)
         if (!artist) {
