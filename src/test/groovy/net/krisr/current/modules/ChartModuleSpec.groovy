@@ -2,6 +2,7 @@ package net.krisr.current.modules
 
 import net.krisr.current.api.Artist
 import net.krisr.current.api.Chart
+import net.krisr.current.api.Placement
 import net.krisr.current.api.Song
 import net.krisr.current.dao.ChartDAO
 import net.krisr.current.dao.PlacementDAO
@@ -29,20 +30,26 @@ class ChartModuleSpec extends Specification {
         setup: 'A known html file'
         LocalDate chartDate = new LocalDate(2014, 5, 14)
         String html = this.getClass().getResource('/fixtures/chart.html').text
+        Long expectedNewChartId = 1
 
         when: 'Parsing the chart data out of the html'
         Chart chart = chartModule.parseHtml(html, chartDate)
 
         then: 'Chart is created'
-        (1..20).each { int id ->
-            artistModule.findOrCreateArtist(_ as String) >> {
-                new Artist(id: id, name: it)
+        1 * chartDAO.findByDate(chartDate) >> null
+        1 * chartDAO.create(chartDate) >> expectedNewChartId
+        20.times { Integer idx ->
+            Long newEntityId = idx.toLong() + 1
+            Integer position = idx + 1
+            1 * artistModule.findOrCreateArtist(_) >> { String artistName ->
+                return new Artist(id: newEntityId, name: artistName)
             }
-            songModule.findOrCreateSong(_ as Artist, _ as String) >> { Artist artist, String title ->
-                new Song(id: id, artist: artist, title: title)
+            1 * songModule.findOrCreateSong(_ as Artist, _ as String) >> { Artist artist, String title ->
+                return new Song(id: newEntityId, artist: artist, title: title)
             }
+            1 * placementDAO.create(expectedNewChartId, position, newEntityId)
         }
-        2 * chartDAO.create(chartDate)
+        0 * _
 
         assert chart.date == chartDate
 

@@ -12,6 +12,7 @@ import java.sql.Types
 /**
  * An {@link Argument} for Joda {@link LocalDateTime} objects.
  */
+@SuppressWarnings(['JdbcStatementReference'])
 public class JodaLocalDateTimeArgument implements Argument {
 
     private final LocalDateTime value

@@ -1,9 +1,6 @@
 package net.krisr.current.dao
 
-import net.krisr.current.api.Artist
 import net.krisr.current.api.Chart
-import net.krisr.current.api.Placement
-import net.krisr.current.api.Song
 import org.joda.time.LocalDate
 import org.skife.jdbi.v2.StatementContext
 import org.skife.jdbi.v2.tweak.ResultSetMapper

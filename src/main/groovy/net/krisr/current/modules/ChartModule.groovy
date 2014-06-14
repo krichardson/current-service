@@ -33,7 +33,7 @@ class ChartModule {
         this.songModule = songModule
     }
 
-    List<Chart> getAllCharts() {
+    List<Chart> listAllCharts() {
         return chartDAO.findAll()
     }
 

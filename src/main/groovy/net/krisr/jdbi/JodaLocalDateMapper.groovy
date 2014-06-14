@@ -9,6 +9,7 @@ import java.sql.SQLException
 /**
  * A {@link TypedMapper} to map Joda {@link LocalDate} objects.
  */
+@SuppressWarnings(['JdbcResultSetReference'])
 public class JodaLocalDateMapper extends TypedMapper<LocalDate> {
 
     @Override

@@ -30,7 +30,7 @@ class ChartResource {
     @GET
     @Timed
     List<Chart> getCharts() {
-        return chartModule.getAllCharts()
+        return chartModule.listAllCharts()
     }
 
     @POST

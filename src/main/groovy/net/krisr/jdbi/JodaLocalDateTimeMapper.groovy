@@ -10,6 +10,7 @@ import java.sql.Timestamp
 /**
  * A {@link TypedMapper} to map Joda {@link LocalDateTime} objects.
  */
+@SuppressWarnings(['JdbcResultSetReference'])
 public class JodaLocalDateTimeMapper extends TypedMapper<LocalDateTime> {
 
     @Override

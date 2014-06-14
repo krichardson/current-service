@@ -1,7 +1,6 @@
 package net.krisr.current.dao
 
 import net.krisr.current.api.Artist
-import net.krisr.current.api.Song
 import org.skife.jdbi.v2.StatementContext
 import org.skife.jdbi.v2.tweak.ResultSetMapper
 
