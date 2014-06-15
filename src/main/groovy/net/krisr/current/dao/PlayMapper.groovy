@@ -26,7 +26,7 @@ class PlayMapper implements ResultSetMapper<Play> {
         )
         Play play = new Play(
                 id: r.getLong('play_id'),
-                playTime: new LocalDateTime(r.getDate('play_time')),
+                playTime: new LocalDateTime(r.getTimestamp('play_time')),
                 song: song
         )
         return play

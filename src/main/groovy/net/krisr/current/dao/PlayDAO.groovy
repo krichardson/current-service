@@ -27,6 +27,22 @@ interface PlayDAO {
     @SqlQuery('select max(play_time) as latest_play_time from play')
     LocalDateTime findLatestPlayTime()
 
+    @SqlQuery('''
+        select p.id as play_id, p.play_time,
+            s.id as song_id, s.title as song_title,
+            a.id as artist_id, a.name as artist_name
+        from play p
+            join song s
+                on p.song_id = s.id
+            join artist a
+                on s.artist_id = a.id
+        where p.play_time >= :startTime
+            and p.play_time <= :endTime
+            order by p.play_time desc
+    ''')
+    List<Play> findPlaysBetween(@Bind('startTime') LocalDateTime startTime,
+                                @Bind('endTime') LocalDateTime endTime)
+
 
     @SqlUpdate('insert into play (play_time, song_id) values (:playTime, :songId)')
     @GetGeneratedKeys

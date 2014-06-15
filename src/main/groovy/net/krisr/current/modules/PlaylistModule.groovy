@@ -3,6 +3,7 @@ package net.krisr.current.modules
 import groovy.util.logging.Slf4j
 import net.krisr.current.api.Artist
 import net.krisr.current.api.Play
+import net.krisr.current.api.PlaylistRequest
 import net.krisr.current.api.Song
 import net.krisr.current.dao.PlayDAO
 
@@ -29,6 +30,10 @@ class PlaylistModule {
         this.playDAO = playDAO
         this.artistModule = artistModule
         this.songModule = songModule
+    }
+
+    List<Play> getPlays(PlaylistRequest request) {
+        return playDAO.findPlaysBetween(request.rangeStartTime, request.rangeEndTime)
     }
 
     List<Play> importPlaylist() {
