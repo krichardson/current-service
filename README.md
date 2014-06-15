@@ -12,12 +12,15 @@ things.
 show results
 2. Play list: Collect all the playlist data (artist/title/date) and
 make it reportable
+3. Add other playlist data sources???
 
 # Testing, Running and Debugging the Application
 
 * To run the tests run:
 
-        `gradle test`
+        gradle test
+        
+        gradle test -Dtest.single=SampleSpec
 
 * To package the service run:
 
@@ -40,4 +43,28 @@ make it reportable
         gradle debug
 
 
+# Using the Application
 
+## Playlist data import 
+
+There is a dropwizard task for importing playlist data. You likely want to schedule something to execute
+this task at periodic intervals. By default the task will import up to a month of data from the time of
+the last imported play
+
+The task is accessible over http on the admin port:
+
+        e.g., http://localhost:8081/tasks/playlist
+
+## Chart data import
+
+To import a chart, the url and date of the chart has to be provided to the endpoint
+
+        POST    /charts (net.krisr.current.resources.ChartResource)
+        
+An example `ChartResource`:
+
+        {
+            "chartUrl":"http://www.thecurrent.org/feature/2014/06/11/chart-show", 
+            "chartDate":"2014-06-11"
+        }
+        
