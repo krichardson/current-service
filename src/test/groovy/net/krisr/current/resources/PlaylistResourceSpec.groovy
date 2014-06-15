@@ -1,7 +1,7 @@
 package net.krisr.current.resources
 
 import io.dropwizard.jersey.params.DateTimeParam
-import net.krisr.current.api.PlaylistRequest
+import net.krisr.current.client.PlaylistRequest
 import net.krisr.current.modules.PlaylistModule
 import org.joda.time.Interval
 import org.joda.time.LocalDateTime

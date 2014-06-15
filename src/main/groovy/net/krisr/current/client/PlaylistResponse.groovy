@@ -1,4 +1,6 @@
-package net.krisr.current.api
+package net.krisr.current.client
+
+import net.krisr.current.api.Play
 
 class PlaylistResponse {
 

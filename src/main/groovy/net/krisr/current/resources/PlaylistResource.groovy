@@ -3,8 +3,8 @@ package net.krisr.current.resources
 import com.codahale.metrics.annotation.Timed
 import io.dropwizard.jersey.params.DateTimeParam
 import net.krisr.current.api.Play
-import net.krisr.current.api.PlaylistRequest
-import net.krisr.current.api.PlaylistResponse
+import net.krisr.current.client.PlaylistRequest
+import net.krisr.current.client.PlaylistResponse
 import net.krisr.current.modules.PlaylistModule
 import org.joda.time.LocalDateTime
 import org.joda.time.Period

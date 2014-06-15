@@ -1,4 +1,4 @@
-package net.krisr.current.api
+package net.krisr.current.client
 
 import org.joda.time.LocalDateTime
 

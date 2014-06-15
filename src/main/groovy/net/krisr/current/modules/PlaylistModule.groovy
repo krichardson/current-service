@@ -3,7 +3,7 @@ package net.krisr.current.modules
 import groovy.util.logging.Slf4j
 import net.krisr.current.api.Artist
 import net.krisr.current.api.Play
-import net.krisr.current.api.PlaylistRequest
+import net.krisr.current.client.PlaylistRequest
 import net.krisr.current.api.Song
 import net.krisr.current.dao.PlayDAO
 

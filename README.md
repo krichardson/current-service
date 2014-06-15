@@ -61,10 +61,10 @@ To import a chart, the url and date of the chart has to be provided to the endpo
 
         POST    /charts (net.krisr.current.resources.ChartResource)
         
-An example `ChartResource`:
+An example `ChartImportRequest` to POST:
 
         {
-            "chartUrl":"http://www.thecurrent.org/feature/2014/06/11/chart-show", 
-            "chartDate":"2014-06-11"
+            "chartDate":"2014-06-11",
+            "chartUrl":"http://www.thecurrent.org/feature/2014/06/11/chart-show" 
         }
         
