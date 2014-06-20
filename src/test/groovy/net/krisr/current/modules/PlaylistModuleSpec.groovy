@@ -4,21 +4,24 @@ import net.krisr.current.api.Artist
 import net.krisr.current.api.Play
 import net.krisr.current.api.Song
 import net.krisr.current.dao.PlayDAO
+import net.krisr.current.dao.PlaySummaryDAO
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 class PlaylistModuleSpec extends Specification {
 
     PlayDAO playDAO
+    PlaySummaryDAO playSummaryDAO
     ArtistModule artistModule
     SongModule songModule
     PlaylistModule playlistModule
 
     def setup() {
         playDAO = Mock()
+        playSummaryDAO = Mock()
         artistModule = Mock()
         songModule = Mock()
-        playlistModule = new PlaylistModule(playDAO, artistModule, songModule)
+        playlistModule = new PlaylistModule(playDAO, playSummaryDAO, artistModule, songModule)
     }
 
     def 'parse play data from an html document'() {

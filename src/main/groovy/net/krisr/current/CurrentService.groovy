@@ -12,6 +12,7 @@ import net.krisr.current.dao.ChartDAO
 import net.krisr.current.dao.PlacementDAO
 import net.krisr.current.dao.PlayDAO
 import net.krisr.current.dao.SongDAO
+import net.krisr.current.dao.PlaySummaryDAO
 import net.krisr.current.modules.ArtistModule
 import net.krisr.current.modules.ChartModule
 import net.krisr.current.modules.PlaylistModule
@@ -19,6 +20,7 @@ import net.krisr.current.modules.SongModule
 import net.krisr.current.resources.ArtistResource
 import net.krisr.current.resources.ChartResource
 import net.krisr.current.resources.PlaylistResource
+import net.krisr.current.resources.TopPlaysResource
 import net.krisr.current.tasks.PlaylistTask
 import net.krisr.jdbi.JodaLocalDateArgumentFactory
 import net.krisr.jdbi.JodaLocalDateMapper
@@ -63,12 +65,13 @@ class CurrentService extends Application<CurrentConfiguration> {
         ChartDAO chartDAO = jdbi.onDemand(ChartDAO)
         PlacementDAO placementDAO = jdbi.onDemand(PlacementDAO)
         PlayDAO playDAO = jdbi.onDemand(PlayDAO)
+        PlaySummaryDAO playSummaryDAO = jdbi.onDemand(PlaySummaryDAO)
 
         //Modules
         ArtistModule artistModule = new ArtistModule(artistDAO)
         SongModule songModule = new SongModule(songDAO)
         ChartModule chartModule = new ChartModule(chartDAO, placementDAO, artistModule, songModule)
-        PlaylistModule playlistModule = new PlaylistModule(playDAO, artistModule, songModule)
+        PlaylistModule playlistModule = new PlaylistModule(playDAO, playSummaryDAO, artistModule, songModule)
 
         //Tasks
         Task playlistTask = new PlaylistTask(playlistModule)
@@ -76,6 +79,7 @@ class CurrentService extends Application<CurrentConfiguration> {
         environment.jersey().register(new ChartResource(chartModule))
         environment.jersey().register(new ArtistResource(artistModule))
         environment.jersey().register(new PlaylistResource(playlistModule))
+        environment.jersey().register(new TopPlaysResource(playlistModule))
         environment.admin().addTask(playlistTask)
     }
 }

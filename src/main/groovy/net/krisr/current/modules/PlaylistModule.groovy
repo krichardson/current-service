@@ -3,10 +3,12 @@ package net.krisr.current.modules
 import groovy.util.logging.Slf4j
 import net.krisr.current.api.Artist
 import net.krisr.current.api.Play
+import net.krisr.current.api.PlaySummary
 import net.krisr.current.client.PlaylistRequest
 import net.krisr.current.api.Song
+import net.krisr.current.client.TopPlaysRequest
 import net.krisr.current.dao.PlayDAO
-
+import net.krisr.current.dao.PlaySummaryDAO
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -23,17 +25,24 @@ class PlaylistModule {
     private static final LocalDateTime EARLIEST_START_DATE = new LocalDateTime(2011, 1, 1, 0, 0)
     private static final int CONNECT_TIMEOUT_MILLIS = 8000
     private final PlayDAO playDAO
+    private final PlaySummaryDAO playSummaryDAO
     private final ArtistModule artistModule
     private final SongModule songModule
 
-    PlaylistModule(PlayDAO playDAO, ArtistModule artistModule, SongModule songModule) {
+    PlaylistModule(PlayDAO playDAO, PlaySummaryDAO playSummaryDAO, ArtistModule artistModule, SongModule songModule) {
         this.playDAO = playDAO
+        this.playSummaryDAO = playSummaryDAO
         this.artistModule = artistModule
         this.songModule = songModule
     }
 
     List<Play> getPlays(PlaylistRequest request) {
         return playDAO.findPlaysBetween(request.rangeStartTime, request.rangeEndTime)
+    }
+
+    List<PlaySummary> getTopPlays(TopPlaysRequest request) {
+        return playSummaryDAO.findTopPlaysBetween(request.rangeStartTime, request.rangeEndTime,
+                request.limit, request.offset)
     }
 
     List<Play> importPlaylist() {
