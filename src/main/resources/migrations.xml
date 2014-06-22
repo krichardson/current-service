@@ -104,6 +104,29 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
         <addUniqueConstraint constraintName="unique_chart_date" tableName="chart" columnNames="date"/>
     </changeSet>
 
+    <changeSet id="add-various-index" author="kris">
+        <createIndex indexName="idx_chart_date"
+                     tableName="chart"
+                     unique="false">
+            <column name="date" type="date"/>
+        </createIndex>
+        <createIndex indexName="idx_artist_name"
+                     tableName="artist"
+                     unique="false">
+            <column name="name" type="varchar(300)"/>
+        </createIndex>
+        <createIndex indexName="idx_song_title"
+                     tableName="song"
+                     unique="false">
+            <column name="title" type="varchar(300)"/>
+        </createIndex>
+        <createIndex indexName="idx_play_play_time"
+                     tableName="play"
+                     unique="false">
+            <column name="play_time" type="timestamp"/>
+        </createIndex>
+    </changeSet>
+
 
 
 </databaseChangeLog>

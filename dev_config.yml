@@ -15,7 +15,8 @@ database:
 
   # the JDBC URL
   #url: jdbc:h2:current
-  url: jdbc:postgresql://127.0.0.1:5432/current
+  #url: jdbc:postgresql://127.0.0.1:5432/current
+  url: jdbc:postgresql://localhost:5432/current
 
 server:
   applicationConnectors:
