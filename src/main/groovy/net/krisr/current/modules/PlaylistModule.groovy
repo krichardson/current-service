@@ -9,6 +9,8 @@ import net.krisr.current.api.Song
 import net.krisr.current.client.TopPlaysRequest
 import net.krisr.current.dao.PlayDAO
 import net.krisr.current.dao.PlaySummaryDAO
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -24,6 +26,7 @@ class PlaylistModule {
 
     private static final LocalDateTime EARLIEST_START_DATE = new LocalDateTime(2011, 1, 1, 0, 0)
     private static final int CONNECT_TIMEOUT_MILLIS = 8000
+    private static final DateTimeZone SOURCE_TIME_ZONE = DateTimeZone.forID('America/Chicago')
     private final PlayDAO playDAO
     private final PlaySummaryDAO playSummaryDAO
     private final ArtistModule artistModule
@@ -48,19 +51,22 @@ class PlaylistModule {
     List<Play> importPlaylist() {
         //Find the last import
         LocalDateTime lastImport = findLastImportTime() ?: EARLIEST_START_DATE
+
         //Add a second, so we don't try to re-import the last song
-        return importPlaylist(lastImport.plusSeconds(1))
+        //Also need to use a DateTime so DST is considered
+        DateTime importStartTime = lastImport.toDateTime(SOURCE_TIME_ZONE).plusSeconds(1)
+        return importPlaylist(importStartTime)
     }
 
-    List<Play> importPlaylist(LocalDateTime startTime) {
+    List<Play> importPlaylist(DateTime startTime) {
         //Don't do more than a month at a time
-        LocalDateTime endTime = new LocalDateTime()
+        DateTime endTime = new DateTime()
         if (startTime.plusMonths(1) < endTime) {
             endTime = startTime.plusMonths(1)
         }
 
         List<Play> playsImported = []
-        LocalDateTime currentHour = startTime
+        DateTime currentHour = startTime
         while (currentHour < endTime) {
             String dataUrl = buildHourUrl(currentHour)
             log.info("Parsing play data for ${dataUrl}")
@@ -79,18 +85,18 @@ class PlaylistModule {
         return playsImported
     }
 
-    List<Play> parseUrl(String url, LocalDateTime currentHour) {
+    List<Play> parseUrl(String url, DateTime currentHour) {
         Connection connection = Jsoup.connect(url).timeout(CONNECT_TIMEOUT_MILLIS)
         Document doc = connection.get()
         return parseDocument(doc, currentHour)
     }
 
-    List<Play> parseHtml(String html, LocalDateTime currentHour) {
+    List<Play> parseHtml(String html, DateTime currentHour) {
         Document doc = Jsoup.parse(html)
         return parseDocument(doc, currentHour)
     }
 
-    private List<Play> parseDocument(Document doc, LocalDateTime currentHourStart) {
+    private List<Play> parseDocument(Document doc, DateTime currentHourStart) {
         Elements songRows = doc.select('article.song')
         if (songRows.size() == 1 && songRows.html().contains('No playlist data available for this hour.')) {
             log.info("There are no songs available ${currentHourStart}.")
@@ -121,7 +127,7 @@ class PlaylistModule {
             playTime = playTime.withHourOfDay(currentHourStart.hourOfDay)
 
             //Save the stuff
-            if (playTime >= currentHourStart) {
+            if (playTime.toDateTime(SOURCE_TIME_ZONE) >= currentHourStart) {
                 Song song = getOrCreateSong(artistName, songTitle)
                 Play play = new Play(song: song, playTime: playTime)
                 play.id = playDAO.create(playTime, song.id)
@@ -137,7 +143,7 @@ class PlaylistModule {
         return song
     }
 
-    private String buildHourUrl(LocalDateTime hour) {
+    private String buildHourUrl(DateTime hour) {
         return 'http://www.thecurrent.org/playlist/' +
                 hour.toString('yyyy-MM-dd') + '/' + hour.toString('H') +
                 '?isajax=1'

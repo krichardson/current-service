@@ -5,6 +5,7 @@ import net.krisr.current.api.Play
 import net.krisr.current.api.Song
 import net.krisr.current.dao.PlayDAO
 import net.krisr.current.dao.PlaySummaryDAO
+import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
@@ -26,7 +27,7 @@ class PlaylistModuleSpec extends Specification {
 
     def 'parse play data from an html document'() {
         setup: 'A known html file'
-        LocalDateTime playHour = new LocalDateTime(2011, 01, 16, 19, 0)
+        DateTime playHour = new DateTime(2011, 01, 16, 19, 0)
         String html = this.getClass().getResource('/fixtures/playlist.html').text
 
         Artist artist1 = new Artist(id: 1, name: 'James Buckley Trio')
@@ -47,15 +48,15 @@ class PlaylistModuleSpec extends Specification {
         1 * playDAO.create(_ as LocalDateTime, _ as Long)
 
         assert playList.size() == 2
-        assert playList[0].playTime == playHour.withMinuteOfHour(56)
+        assert playList[0].playTime == playHour.withMinuteOfHour(56).toLocalDateTime()
         assert playList[0].song == song1
-        assert playList[1].playTime == playHour.withMinuteOfHour(52)
+        assert playList[1].playTime == playHour.withMinuteOfHour(52).toLocalDateTime()
         assert playList[1].song == song2
     }
 
     def 'Return empty list when there is no data for the hour'() {
         setup: 'A known html file'
-        LocalDateTime playHour = new LocalDateTime(2011, 01, 16, 21, 0)
+        DateTime playHour = new DateTime(2011, 01, 16, 21, 0)
         String html = this.getClass().getResource('/fixtures/playlist_nodata.html').text
 
         when: 'Parsing the chart data out of the html'
