@@ -66,4 +66,28 @@ class PlaylistModuleSpec extends Specification {
         assert playList.size() == 0
     }
 
+    def 'Skip plays that do not have an artist'() {
+        setup: 'A known html file'
+        DateTime playHour = new DateTime(2011, 01, 16, 19, 0)
+        String html = this.getClass().getResource('/fixtures/playlist_empty_artist.html').text
+
+        when: 'Parsing the chart data out of the html'
+        List<Play> playList = playlistModule.parseHtml(html, playHour)
+
+        then:
+        assert playList.size() == 0
+    }
+
+    def 'Skip plays that do not have a song title'() {
+        setup: 'A known html file'
+        DateTime playHour = new DateTime(2011, 01, 16, 19, 0)
+        String html = this.getClass().getResource('/fixtures/playlist_empty_title.html').text
+
+        when: 'Parsing the chart data out of the html'
+        List<Play> playList = playlistModule.parseHtml(html, playHour)
+
+        then:
+        assert playList.size() == 0
+    }
+
 }

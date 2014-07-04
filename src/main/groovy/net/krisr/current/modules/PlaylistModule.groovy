@@ -112,10 +112,16 @@ class PlaylistModule {
             //Artist
             Element artistElement = row.select('div h5.artist')[0]
             String artistName = elementValue(artistElement)
+            if (!artistName) {
+                continue
+            }
 
             //Song Title
             Element songElement = row.select('div h5.title')[0]
             String songTitle = elementValue(songElement)
+            if (!songTitle) {
+                continue
+            }
 
             //Date/Time
             Element dateTime = row.select('div.songTime time')[0]
@@ -123,8 +129,14 @@ class PlaylistModule {
             String timeString = elementValue(dateTime)
 
             //The parsed time is 12 hour format, so need to set the correct 24 hour hour
-            LocalDateTime playTime = LocalDateTime.parse(dateString + ' ' + timeString, formatter)
-            playTime = playTime.withHourOfDay(currentHourStart.hourOfDay)
+            LocalDateTime playTime
+            try {
+                playTime = LocalDateTime.parse(dateString + ' ' + timeString, formatter)
+                playTime = playTime.withHourOfDay(currentHourStart.hourOfDay)
+            } catch (IllegalArgumentException e) {
+                log.warn("Unable to parse date ${dateString} + time ${timeString}. Defaulting to the hour", e)
+                playTime = currentHourStart.toLocalDateTime()
+            }
 
             //Save the stuff
             if (playTime.toDateTime(SOURCE_TIME_ZONE) >= currentHourStart) {
