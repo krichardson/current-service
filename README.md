@@ -53,7 +53,7 @@ the last imported play
 
 The task is accessible over http on the admin port:
 
-        e.g., http://localhost:8081/tasks/playlist
+        e.g., curl -X POST http://localhost:8081/tasks/playlist
 
 ## Chart data import
 
