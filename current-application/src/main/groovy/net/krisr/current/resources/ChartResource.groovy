@@ -1,5 +1,6 @@
 package net.krisr.current.resources
 
+import io.dropwizard.jersey.params.DateTimeParam
 import io.dropwizard.jersey.params.LongParam
 import com.codahale.metrics.annotation.Timed
 import io.swagger.annotations.Api
@@ -15,6 +16,7 @@ import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -33,7 +35,11 @@ class ChartResource {
     @GET
     @Timed
     @ApiOperation(value = 'Get a list of charts')
-    List<Chart> getCharts() {
+    List<Chart> getCharts(@QueryParam('chartDate') Optional<DateTimeParam> chartDate) {
+
+        if (chartDate.isPresent()) {
+            return [chartModule.getChart(new LocalDate(chartDate.get().get()))]
+        }
         return chartModule.listAllCharts()
     }
 

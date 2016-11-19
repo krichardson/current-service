@@ -46,6 +46,14 @@ class ChartModule {
        return chart
     }
 
+    Chart getChart(LocalDate chartDate) {
+        Chart chart = chartDAO.findByDate(chartDate)
+        if (chart) {
+            chart.placements = placementDAO.findAllByChartId(chart.id)
+        }
+        return chart
+    }
+
     Chart parseUrl(String chartUrl, LocalDate chartDate) {
         Connection connection = Jsoup.connect(chartUrl).timeout(CONNECT_TIMEOUT_MILLIS)
         Document doc = connection.get()
