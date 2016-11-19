@@ -1,0 +1,10 @@
+apply plugin: 'groovy'
+
+dependencies {
+    testCompile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
+        exclude group: "org.codehaus.groovy"
+    }
+    testRuntime "cglib:cglib-nodep:3.2.4"     // allows mocking of classes (in addition to interfaces)
+    testRuntime "org.objenesis:objenesis:2.4" // allows mocking of classes without default constructor (together with CGLIB)
+}

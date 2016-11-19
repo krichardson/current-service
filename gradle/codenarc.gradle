@@ -1,0 +1,10 @@
+apply plugin: 'codenarc'
+
+codenarcMain {
+    ignoreFailures = false
+    configFile = rootProject.file('codenarcrule.groovy')
+}
+codenarcTest {
+    ignoreFailures = false
+    configFile = rootProject.file('codenarcrule-test.groovy')
+}

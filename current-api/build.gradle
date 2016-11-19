@@ -1,0 +1,9 @@
+apply plugin: 'groovy'
+apply from: rootProject.file('gradle/codenarc.gradle')
+apply from: rootProject.file('gradle/test.gradle')
+
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile "io.dropwizard:dropwizard-validation:${dropwizardVersion}"
+    compile 'joda-time:joda-time:2.9.6'
+}

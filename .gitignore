@@ -4,3 +4,4 @@
 .gradle
 logs/
 build/
+.idea

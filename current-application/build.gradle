@@ -1,0 +1,93 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+apply from: rootProject.file('gradle/codenarc.gradle')
+apply from: rootProject.file('gradle/test.gradle')
+
+mainClassName='net.krisr.current.CurrentService'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://raw.github.com/fernandezpablo85/scribe-java/mvn-repo/" }
+}
+
+dependencies {
+
+    compile project(':current-api')
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile "${dropwizardGroup}:dropwizard-core:${dropwizardVersion}"
+    compile "${dropwizardGroup}:dropwizard-testing:${dropwizardVersion}"
+    compile "${dropwizardGroup}:dropwizard-jdbi:${dropwizardVersion}"
+    compile "${dropwizardGroup}:dropwizard-migrations:${dropwizardVersion}"
+    compile "${dropwizardGroup}:dropwizard-auth:${dropwizardVersion}"
+    compile "${dropwizardGroup}:dropwizard-client:${dropwizardVersion}"
+    compile "${dropwizardGroup}:dropwizard-views:${dropwizardVersion}"
+
+    compile 'org.postgresql:postgresql:9.3-1101-jdbc4'
+    compile 'org.jsoup:jsoup:1.10.1'
+    compile 'com.github.scribejava:scribejava-apis:3.2.0'
+
+    testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
+
+    // needed for validation tests so logging in hibernate validator does not throw exception
+    compile 'ch.qos.logback:logback-classic:1.1.7'
+    compile "org.slf4j:log4j-over-slf4j:1.7.21"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': "${mainClassName}"
+        attributes 'Built-Date': new Date() //now
+        attributes 'Built-By': System.getProperty('user.name')
+        attributes 'Build-Jdk': System.getProperty('java.version')
+        attributes 'Implementation-Title': project.name
+        attributes 'Implementation-Version': project.version
+        attributes 'Implementation-Vendor-Id': project.group
+    }
+}
+
+shadowJar {
+    mergeServiceFiles() {
+        include 'META-INF/services/*'
+    }
+}
+
+runShadow {
+    args 'server', 'config.yml'
+}
+
+/*
+task ('run', type: JavaExec, dependsOn: 'shadowJar', group: 'dropwizard',  description: "Run service using dev configuration") {
+    main = '-jar'
+    args = ["${project.tasks.shadowJar.archivePath}", 'server', 'config.yml']
+    systemProperties = project.ext.properties.findAll { it.key.startsWith('dw') }
+}
+
+task ('debug', type: JavaExec, dependsOn: 'shadowJar', group: "dropwizard", description: "Run/debug service using dev configuration") {
+    main = '-jar'
+    debug = true
+    args = ["${project.tasks.shadowJar.archivePath}", 'server', 'config.yml']
+    systemProperties = project.ext.properties.findAll { it.key.startsWith('dw') }
+}
+*/
+
+task ('migrate', type: JavaExec, dependsOn: 'shadowJar', group: 'dropwizard', description: "Run migrations using the dev configuration") {
+    main = '-jar'
+    args = ["${project.tasks.shadowJar.archivePath}", 'db', 'migrate', 'config.yml']
+}
+
+task ('dropAll', type: JavaExec, dependsOn: 'shadowJar', group: 'dropwizard',  description: "Run drop-all database command") {
+    main = '-jar'
+    args = ["${project.tasks.shadowJar.archivePath}", 'db', 'drop-all', 'config.yml', '--confirm-delete-everything']
+}
