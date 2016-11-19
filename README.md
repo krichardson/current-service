@@ -1,7 +1,7 @@
 # Introduction
 
 This is a service for gathering and archiving song play data
-from thecurrent.org.
+from [thecurrent.org](http://thecurrent.org).
 
 Other applications can consume this data to do interesting & useful
 things.
@@ -28,12 +28,7 @@ things.
 
 * To run the server run:
 
-        gradle run
-        
-* To debug the server run:
-        
-        gradle debug
-
+        gradle runShadow
 
 # Using the Application
 
