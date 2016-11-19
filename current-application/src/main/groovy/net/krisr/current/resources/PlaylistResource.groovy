@@ -2,6 +2,8 @@ package net.krisr.current.resources
 
 import com.codahale.metrics.annotation.Timed
 import io.dropwizard.jersey.params.DateTimeParam
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 import net.krisr.current.api.Play
 import net.krisr.current.api.PlaylistRequest
 import net.krisr.current.api.PlaylistResponse
@@ -9,6 +11,7 @@ import net.krisr.current.modules.PlaylistModule
 import org.joda.time.LocalDateTime
 import org.joda.time.Period
 
+import javax.validation.constraints.NotNull
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
@@ -19,6 +22,7 @@ import javax.ws.rs.core.Response
 
 @Path('/playlist')
 @Produces(MediaType.APPLICATION_JSON)
+@Api(value = 'Playlists')
 class PlaylistResource {
 
     private static final Period MAX_PLAYLIST_RANGE = Period.days(1)
@@ -30,8 +34,9 @@ class PlaylistResource {
 
     @GET
     @Timed
-    PlaylistResponse plays(@QueryParam('rangeStartTime') DateTimeParam rangeStartTime,
-                           @QueryParam('rangeEndTime') DateTimeParam rangeEndTime) {
+    @ApiOperation(value = "Get the plays for a specified time period")
+    PlaylistResponse plays(@QueryParam('rangeStartTime') @NotNull DateTimeParam rangeStartTime,
+                           @QueryParam('rangeEndTime') @NotNull DateTimeParam rangeEndTime) {
         LocalDateTime start = rangeStartTime ?
                 new LocalDateTime(rangeStartTime.get()) : new LocalDateTime()
         LocalDateTime end = rangeEndTime ?

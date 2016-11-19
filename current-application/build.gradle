@@ -33,6 +33,7 @@ dependencies {
     compile "${dropwizardGroup}:dropwizard-auth:${dropwizardVersion}"
     compile "${dropwizardGroup}:dropwizard-client:${dropwizardVersion}"
     compile "${dropwizardGroup}:dropwizard-views:${dropwizardVersion}"
+    compile "com.smoketurner:dropwizard-swagger:1.0.0-1"
 
     compile 'org.postgresql:postgresql:9.3-1101-jdbc4'
     compile 'org.jsoup:jsoup:1.10.1'

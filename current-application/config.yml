@@ -39,3 +39,12 @@ logging:
 
   appenders:
     - type: console
+
+swagger:
+  enabled: true
+  resourcePackage: net.krisr.current.resources
+  schemes:
+    - http
+  swaggerViewConfiguration:
+    showAuth: false
+    pageTitle: Current Play Tracker

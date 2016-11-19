@@ -3,6 +3,8 @@ package net.krisr.current.resources
 import com.codahale.metrics.annotation.Timed
 import io.dropwizard.jersey.params.DateTimeParam
 import io.dropwizard.jersey.params.IntParam
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 import net.krisr.current.api.PlaySummary
 import net.krisr.current.api.TopPlaysRequest
 import net.krisr.current.api.TopPlaysResponse
@@ -21,6 +23,7 @@ import javax.ws.rs.core.Response
 
 @Path('/topplays')
 @Produces(MediaType.APPLICATION_JSON)
+@Api(value = 'Top Plays')
 class TopPlaysResource {
 
     private final PlaylistModule playlistModule
@@ -32,6 +35,7 @@ class TopPlaysResource {
 
     @GET
     @Timed
+    @ApiOperation(value = 'Get the top plays for a specified time range')
     TopPlaysResponse plays(@QueryParam('rangeStartTime') @NotNull DateTimeParam rangeStartTime,
                            @QueryParam('rangeEndTime') @NotNull DateTimeParam rangeEndTime,
                            @QueryParam('limit') @DefaultValue('20') IntParam limit,

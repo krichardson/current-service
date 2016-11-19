@@ -3,6 +3,8 @@ package net.krisr.current.resources
 import com.codahale.metrics.annotation.Timed
 import io.dropwizard.jersey.params.IntParam
 import io.dropwizard.jersey.params.LongParam
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 import net.krisr.current.api.Artist
 import net.krisr.current.modules.ArtistModule
 import org.hibernate.validator.constraints.NotEmpty
@@ -19,6 +21,7 @@ import javax.ws.rs.core.Response
 
 @Path('/artists')
 @Produces(MediaType.APPLICATION_JSON)
+@Api(value = 'Artists')
 class ArtistResource {
 
     ArtistModule artistModule
@@ -29,6 +32,7 @@ class ArtistResource {
 
     @GET
     @Timed
+    @ApiOperation(value = "Get a list of artists, based on play data")
     List<Artist> listArtists(@QueryParam('limit') @DefaultValue('50') IntParam limit,
                              @QueryParam('offset') @DefaultValue('0') IntParam offset) {
         return artistModule.listArtists(limit.get(), offset.get())
@@ -37,6 +41,7 @@ class ArtistResource {
     @GET
     @Timed
     @Path('/{artistId}')
+    @ApiOperation(value = "Get information about an artist")
     Artist getArtist(@PathParam('artistId') LongParam artistId) {
         Artist artist = artistModule.findById(artistId.get())
         if (!artist) {
@@ -48,6 +53,7 @@ class ArtistResource {
     @GET
     @Timed
     @Path('/search')
+    @ApiOperation(value = "Search for an artist")
     List<Artist> searchArtists(@QueryParam('name') @NotEmpty String name) {
         return [artistModule.findByName(name)]
     }

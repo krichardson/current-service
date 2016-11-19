@@ -7,6 +7,8 @@ import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
 import io.dropwizard.jdbi.DBIFactory
 import io.dropwizard.migrations.MigrationsBundle
+import io.federecio.dropwizard.swagger.SwaggerBundle
+import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration
 import net.krisr.current.dao.ArtistDAO
 import net.krisr.current.dao.ChartDAO
 import net.krisr.current.dao.PlacementDAO
@@ -33,7 +35,7 @@ class CurrentService extends Application<CurrentConfiguration> {
         new CurrentService().run(args)
     }
 
-    MigrationsBundle<CurrentConfiguration> migrationsBundle =
+    private final MigrationsBundle<CurrentConfiguration> migrationsBundle =
         new MigrationsBundle<CurrentConfiguration>() {
             @Override
             public DataSourceFactory getDataSourceFactory(CurrentConfiguration configuration) {
@@ -41,10 +43,18 @@ class CurrentService extends Application<CurrentConfiguration> {
             }
         }
 
+    private final SwaggerBundle<CurrentConfiguration> swaggerBundle = new SwaggerBundle<CurrentConfiguration>() {
+        @Override
+        protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(CurrentConfiguration configuration) {
+            return configuration.swaggerBundleConfiguration
+        }
+    }
+
     @Override
     public void initialize(Bootstrap<CurrentConfiguration> bootstrap) {
         bootstrap.with {
             addBundle migrationsBundle
+            addBundle swaggerBundle
         }
     }
 
