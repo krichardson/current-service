@@ -1,2 +1,3 @@
 include 'whatplayed-api'
 include 'whatplayed-application'
+include 'whatplayed-client'
