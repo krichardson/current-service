@@ -1,6 +1,8 @@
 package com.whatplayed.resources
 
 import com.codahale.metrics.annotation.Timed
+import com.whatplayed.api.Source
+import com.whatplayed.modules.SourceModule
 import io.dropwizard.jersey.params.DateTimeParam
 import io.dropwizard.jersey.params.IntParam
 import io.swagger.annotations.Api
@@ -8,9 +10,11 @@ import io.swagger.annotations.ApiOperation
 import com.whatplayed.api.PlaySummary
 import com.whatplayed.api.TopPlaysRequest
 import com.whatplayed.api.TopPlaysResponse
-import com.whatplayed.modules.PlaylistModule
+import com.whatplayed.modules.PlayModule
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue
 import org.joda.time.LocalDateTime
 
+import javax.validation.constraints.NotNull
 import javax.ws.rs.DefaultValue
 import javax.ws.rs.GET
 import javax.ws.rs.Path
@@ -24,21 +28,23 @@ import javax.ws.rs.core.Response
 @Path('/sources/{sourceId}/topplays')
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = 'Top Plays')
-class TopPlaysResource {
+class TopPlayResource extends AbstractSourceResource {
 
-    private final PlaylistModule playlistModule
+    private final PlayModule playModule
     private static final Integer MAX_TOP_PLAYS = 100
 
-    TopPlaysResource(PlaylistModule playlistModule) {
-        this.playlistModule = playlistModule
+    TopPlayResource(final PlayModule playModule,
+                    final SourceModule sourceModule) {
+        super(sourceModule)
+        this.playModule = playModule
     }
 
     @GET
     @Timed
     @ApiOperation(value = 'Get the top plays for a specified time range')
     TopPlaysResponse plays(@PathParam('sourceId') String sourceIdOrAll,
-                           @QueryParam('rangeStartTime') DateTimeParam rangeStartTime,
-                           @QueryParam('rangeEndTime') DateTimeParam rangeEndTime,
+                           @QueryParam('rangeStartTime') @UnwrapValidatedValue @NotNull DateTimeParam rangeStartTime,
+                           @QueryParam('rangeEndTime') @UnwrapValidatedValue @NotNull DateTimeParam rangeEndTime,
                            @QueryParam('limit') @DefaultValue('20') IntParam limit,
                            @QueryParam('offset') @DefaultValue('0') IntParam offset) {
 
@@ -54,8 +60,10 @@ class TopPlaysResource {
             }
         }
 
+        Source source = sourceId ? getSource(sourceId) : null
+
         TopPlaysRequest request = new TopPlaysRequest(
-                sourceId: sourceId,
+                source: source,
                 rangeStartTime: new LocalDateTime(rangeStartTime.get()),
                 rangeEndTime: new LocalDateTime(rangeEndTime.get()),
                 limit: limit.get(),
@@ -87,7 +95,7 @@ class TopPlaysResource {
             )
         }
 
-        List<PlaySummary> topPlays = playlistModule.getTopPlays(request)
+        List<PlaySummary> topPlays = playModule.getTopPlays(request)
         return new TopPlaysResponse(
                 request: request,
                 topPlays: topPlays,

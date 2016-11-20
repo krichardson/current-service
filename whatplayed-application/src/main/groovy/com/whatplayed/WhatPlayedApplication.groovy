@@ -23,12 +23,12 @@ import com.whatplayed.dao.SongDAO
 import com.whatplayed.dao.PlaySummaryDAO
 import com.whatplayed.modules.ArtistModule
 import com.whatplayed.modules.ChartModule
-import com.whatplayed.modules.PlaylistModule
+import com.whatplayed.modules.PlayModule
 import com.whatplayed.modules.SongModule
 import com.whatplayed.resources.ArtistResource
 import com.whatplayed.resources.ChartResource
-import com.whatplayed.resources.PlaylistResource
-import com.whatplayed.resources.TopPlaysResource
+import com.whatplayed.resources.PlayResource
+import com.whatplayed.resources.TopPlayResource
 import com.whatplayed.tasks.PlaylistTask
 import com.whatplayed.dao.jdbi.JodaLocalDateArgumentFactory
 import com.whatplayed.dao.jdbi.JodaLocalDateMapper
@@ -93,17 +93,17 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
         ArtistModule artistModule = new ArtistModule(artistDAO)
         SongModule songModule = new SongModule(songDAO)
         ChartModule chartModule = new ChartModule(chartDAO, placementDAO, artistModule, songModule)
-        PlaylistModule playlistModule = new PlaylistModule(
+        PlayModule playModule = new PlayModule(
                 playDAO, playSummaryDAO, sourceModule, artistModule, songModule)
 
         //Tasks
-        Task playlistTask = new PlaylistTask(playlistModule)
+        Task playlistTask = new PlaylistTask(playModule)
 
         environment.jersey().register(new SourceResource(sourceModule))
         environment.jersey().register(new ChartResource(chartModule))
         environment.jersey().register(new ArtistResource(artistModule))
-        environment.jersey().register(new PlaylistResource(playlistModule))
-        environment.jersey().register(new TopPlaysResource(playlistModule))
+        environment.jersey().register(new PlayResource(playModule, sourceModule))
+        environment.jersey().register(new TopPlayResource(playModule, sourceModule))
         environment.admin().addTask(playlistTask)
     }
 }

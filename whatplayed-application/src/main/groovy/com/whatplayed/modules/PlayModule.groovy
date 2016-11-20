@@ -24,7 +24,7 @@ import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 
 @Slf4j
-class PlaylistModule {
+class PlayModule {
 
     private static final LocalDateTime EARLIEST_START_DATE = new LocalDateTime(2011, 1, 1, 0, 0)
     private static final int CONNECT_TIMEOUT_MILLIS = 8000
@@ -36,11 +36,11 @@ class PlaylistModule {
     private final ArtistModule artistModule
     private final SongModule songModule
 
-    PlaylistModule(PlayDAO playDAO,
-                   PlaySummaryDAO playSummaryDAO,
-                   SourceModule sourceModule,
-                   ArtistModule artistModule,
-                   SongModule songModule) {
+    PlayModule(PlayDAO playDAO,
+               PlaySummaryDAO playSummaryDAO,
+               SourceModule sourceModule,
+               ArtistModule artistModule,
+               SongModule songModule) {
         this.playDAO = playDAO
         this.playSummaryDAO = playSummaryDAO
         this.sourceModule = sourceModule
@@ -49,12 +49,12 @@ class PlaylistModule {
     }
 
     List<Play> getPlays(PlaylistRequest request) {
-        return playDAO.findPlaysBetween(request.rangeStartTime, request.rangeEndTime)
+        return playDAO.findPlaysBetween(request.source.id, request.rangeStartTime, request.rangeEndTime)
     }
 
     List<PlaySummary> getTopPlays(TopPlaysRequest request) {
-        if (request.sourceId) {
-            return playSummaryDAO.findTopPlaysBetween(request.sourceId, request.rangeStartTime, request.rangeEndTime,
+        if (request.source) {
+            return playSummaryDAO.findTopPlaysBetween(request.source.id, request.rangeStartTime, request.rangeEndTime,
                     request.limit, request.offset)
         }
         return playSummaryDAO.findTopPlaysBetween(request.rangeStartTime, request.rangeEndTime,

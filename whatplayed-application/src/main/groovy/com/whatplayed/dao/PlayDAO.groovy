@@ -44,9 +44,11 @@ interface PlayDAO {
                 on p.source_id = sc.id
         where p.play_time >= :startTime
             and p.play_time <= :endTime
+            and p.source_id = :sourceId
             order by p.play_time desc
     ''')
-    List<Play> findPlaysBetween(@Bind('startTime') LocalDateTime startTime,
+    List<Play> findPlaysBetween(@Bind('sourceId') Long sourceId,
+                                @Bind('startTime') LocalDateTime startTime,
                                 @Bind('endTime') LocalDateTime endTime)
 
 

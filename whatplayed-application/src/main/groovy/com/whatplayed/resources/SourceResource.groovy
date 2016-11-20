@@ -10,17 +10,14 @@ import io.swagger.annotations.ApiOperation
 
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
 
 @Path('/sources')
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = 'Sources')
-class SourceResource {
-
-    SourceModule sourceModule
+class SourceResource extends AbstractSourceResource {
 
     SourceResource(final SourceModule sourceModule) {
-        this.sourceModule = sourceModule
+        super(sourceModule)
     }
 
     @GET
@@ -36,11 +33,7 @@ class SourceResource {
     @Path('/{sourceId}')
     @ApiOperation(value = 'Get a specific source')
     Source getSource(@PathParam('sourceId') LongParam sourceId) {
-        Source source = sourceModule.getSource(sourceId.get())
-        if (!source) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND)
-        }
-        return source
+        return getSource(sourceId.get())
     }
 
 }

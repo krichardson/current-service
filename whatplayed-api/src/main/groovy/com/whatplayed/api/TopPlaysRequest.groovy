@@ -6,8 +6,7 @@ import javax.validation.constraints.NotNull
 
 class TopPlaysRequest {
 
-    @NotNull
-    Long sourceId
+    Source source
 
     @NotNull
     LocalDateTime rangeStartTime

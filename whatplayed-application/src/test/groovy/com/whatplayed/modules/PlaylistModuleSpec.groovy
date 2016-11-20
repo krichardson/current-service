@@ -17,7 +17,7 @@ class PlaylistModuleSpec extends Specification {
     SourceModule sourceModule
     ArtistModule artistModule
     SongModule songModule
-    PlaylistModule playlistModule
+    PlayModule playlistModule
 
     def setup() {
         playDAO = Mock()
@@ -25,7 +25,7 @@ class PlaylistModuleSpec extends Specification {
         sourceModule = Mock()
         artistModule = Mock()
         songModule = Mock()
-        playlistModule = new PlaylistModule(playDAO, playSummaryDAO, sourceModule, artistModule, songModule)
+        playlistModule = new PlayModule(playDAO, playSummaryDAO, sourceModule, artistModule, songModule)
     }
 
     def 'parse play data from an html document'() {

@@ -2,22 +2,22 @@ package com.whatplayed.tasks
 
 import com.google.common.collect.ImmutableMultimap
 import io.dropwizard.servlets.tasks.Task
-import com.whatplayed.modules.PlaylistModule
+import com.whatplayed.modules.PlayModule
 
 class PlaylistTask extends Task {
 
     private static final String name = 'playlist'
-    private final PlaylistModule playlistModule
+    private final PlayModule playModule
 
-    PlaylistTask(PlaylistModule playlistModule) {
+    PlaylistTask(PlayModule playModule) {
         super(name)
-        this.playlistModule = playlistModule
+        this.playModule = playModule
     }
 
     @Override
     public void execute(ImmutableMultimap<String, String> parameters, PrintWriter output) {
         output.println('running playlist task')
-        playlistModule.importPlaylist()
+        playModule.importPlaylist()
     }
 
 }
