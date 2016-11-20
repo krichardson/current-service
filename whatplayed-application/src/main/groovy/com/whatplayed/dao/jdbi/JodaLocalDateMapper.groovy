@@ -1,4 +1,4 @@
-package com.whatplayed.jdbi
+package com.whatplayed.dao.jdbi
 
 import org.joda.time.LocalDate
 import org.skife.jdbi.v2.util.TypedMapper

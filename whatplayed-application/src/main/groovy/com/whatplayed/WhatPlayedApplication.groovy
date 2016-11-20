@@ -27,10 +27,10 @@ import com.whatplayed.resources.ChartResource
 import com.whatplayed.resources.PlaylistResource
 import com.whatplayed.resources.TopPlaysResource
 import com.whatplayed.tasks.PlaylistTask
-import com.whatplayed.jdbi.JodaLocalDateArgumentFactory
-import com.whatplayed.jdbi.JodaLocalDateMapper
-import com.whatplayed.jdbi.JodaLocalDateTimeArgumentFactory
-import com.whatplayed.jdbi.JodaLocalDateTimeMapper
+import com.whatplayed.dao.jdbi.JodaLocalDateArgumentFactory
+import com.whatplayed.dao.jdbi.JodaLocalDateMapper
+import com.whatplayed.dao.jdbi.JodaLocalDateTimeArgumentFactory
+import com.whatplayed.dao.jdbi.JodaLocalDateTimeMapper
 import org.skife.jdbi.v2.DBI
 
 class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {

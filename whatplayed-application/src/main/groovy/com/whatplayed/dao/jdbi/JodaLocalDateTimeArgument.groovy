@@ -1,22 +1,23 @@
-package com.whatplayed.jdbi
+package com.whatplayed.dao.jdbi
 
-import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import org.skife.jdbi.v2.StatementContext
 import org.skife.jdbi.v2.tweak.Argument
 
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import java.sql.Timestamp
 import java.sql.Types
 
 /**
- * An {@link Argument} for Joda {@link LocalDate} objects.
+ * An {@link Argument} for Joda {@link LocalDateTime} objects.
  */
 @SuppressWarnings(['JdbcStatementReference'])
-public class JodaLocalDateArgument implements Argument {
+public class JodaLocalDateTimeArgument implements Argument {
 
-    private final LocalDate value
+    private final LocalDateTime value
 
-    JodaLocalDateArgument(final LocalDate value) {
+    JodaLocalDateTimeArgument(final LocalDateTime value) {
         this.value = value
     }
 
@@ -25,9 +26,9 @@ public class JodaLocalDateArgument implements Argument {
                       final PreparedStatement statement,
                       final StatementContext ctx) throws SQLException {
         if (value != null) {
-            statement.setDate(position, new java.sql.Date(value.toDateTimeAtStartOfDay().millis))
+            statement.setTimestamp(position, new Timestamp(value.toDateTime().millis))
         } else {
-            statement.setNull(position, Types.DATE)
+            statement.setNull(position, Types.TIMESTAMP)
         }
     }
 }
