@@ -1,2 +1,2 @@
-include 'current-api'
-include 'current-application'
+include 'whatplayed-api'
+include 'whatplayed-application'
