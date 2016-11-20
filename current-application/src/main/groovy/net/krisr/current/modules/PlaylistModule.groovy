@@ -87,17 +87,18 @@ class PlaylistModule {
     }
 
     List<Play> parseUrl(String url, DateTime currentHour, Boolean retry = true) {
-        Connection connection
+        Document doc
         try {
-            connection = Jsoup.connect(url).timeout(CONNECT_TIMEOUT_MILLIS)
-        } catch (Exception e) {
+            Connection connection = Jsoup.connect(url).timeout(CONNECT_TIMEOUT_MILLIS)
+            doc = connection.get()
+        } catch (IOException e) {
             if (!retry) {
                 throw e
             }
             log.info("Error fetching document: ${e.message}. Will retry", e)
             return parseUrl(url, currentHour, false)
         }
-        Document doc = connection.get()
+
         return parseDocument(doc, currentHour)
 
     }

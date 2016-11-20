@@ -36,8 +36,8 @@ class TopPlaysResource {
     @GET
     @Timed
     @ApiOperation(value = 'Get the top plays for a specified time range')
-    TopPlaysResponse plays(@QueryParam('rangeStartTime') @NotNull DateTimeParam rangeStartTime,
-                           @QueryParam('rangeEndTime') @NotNull DateTimeParam rangeEndTime,
+    TopPlaysResponse plays(@QueryParam('rangeStartTime') DateTimeParam rangeStartTime,
+                           @QueryParam('rangeEndTime') DateTimeParam rangeEndTime,
                            @QueryParam('limit') @DefaultValue('20') IntParam limit,
                            @QueryParam('offset') @DefaultValue('0') IntParam offset) {
 

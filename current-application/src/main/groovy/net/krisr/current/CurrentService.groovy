@@ -1,5 +1,8 @@
 package net.krisr.current
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.joda.JodaModule
 import io.dropwizard.Application
 import io.dropwizard.db.DataSourceFactory
 import io.dropwizard.servlets.tasks.Task
@@ -61,6 +64,10 @@ class CurrentService extends Application<CurrentConfiguration> {
     @Override
     public void run(CurrentConfiguration configuration,
                     Environment environment) throws ClassNotFoundException {
+
+        environment.objectMapper.registerModule(new JodaModule())
+        environment.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        environment.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
         DBIFactory factory = new DBIFactory()
         DBI jdbi = factory.build(environment, configuration.database, 'postgresql')

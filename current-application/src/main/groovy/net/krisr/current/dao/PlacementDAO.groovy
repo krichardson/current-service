@@ -20,6 +20,7 @@ interface PlacementDAO {
             join artist a
                 on s.artist_id = a.id
         where p.chart_id = :chartId
+            order by p.position
         ''')
     List<Placement> findAllByChartId(@Bind('chartId') Long chartId)
 
