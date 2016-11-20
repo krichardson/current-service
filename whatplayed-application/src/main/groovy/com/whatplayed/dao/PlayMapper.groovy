@@ -3,6 +3,7 @@ package com.whatplayed.dao
 import com.whatplayed.api.Artist
 import com.whatplayed.api.Play
 import com.whatplayed.api.Song
+import com.whatplayed.api.Source
 import org.joda.time.LocalDateTime
 import org.skife.jdbi.v2.StatementContext
 import org.skife.jdbi.v2.tweak.ResultSetMapper
@@ -15,6 +16,10 @@ class PlayMapper implements ResultSetMapper<Play> {
 
     public Play map(int index, ResultSet r, StatementContext ctx) throws SQLException {
 
+        Source source = new Source(
+                id: r.getLong('source_id'),
+                name: r.getString('source_name'),
+        )
         Artist artist = new Artist(
                 id: r.getLong('artist_id'),
                 name: r.getString('artist_name'),
@@ -28,6 +33,7 @@ class PlayMapper implements ResultSetMapper<Play> {
                 id: r.getLong('play_id'),
                 playTime: new LocalDateTime(r.getTimestamp('play_time')),
                 song: song,
+                source: source,
         )
         return play
 

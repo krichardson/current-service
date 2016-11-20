@@ -14,12 +14,15 @@ interface PlayDAO {
     @SqlQuery('''
         select p.id as play_id, p.play_time,
             s.id as song_id, s.title as song_title,
-            a.id as artist_id, a.name as artist_name
+            a.id as artist_id, a.name as artist_name,
+            sc.id as source_id, sc.name as source_name
         from play p
             join song s
                 on p.song_id = s.id
             join artist a
                 on s.artist_id = a.id
+            join source sc
+                on p.source_id = sc.id
         where p.id = :id
     ''')
     Play findById(@Bind('id') Long id)
@@ -30,12 +33,15 @@ interface PlayDAO {
     @SqlQuery('''
         select p.id as play_id, p.play_time,
             s.id as song_id, s.title as song_title,
-            a.id as artist_id, a.name as artist_name
+            a.id as artist_id, a.name as artist_name,
+            sc.id as source_id, sc.name as source_name
         from play p
             join song s
                 on p.song_id = s.id
             join artist a
                 on s.artist_id = a.id
+            join source sc
+                on p.source_id = sc.id
         where p.play_time >= :startTime
             and p.play_time <= :endTime
             order by p.play_time desc
@@ -44,9 +50,10 @@ interface PlayDAO {
                                 @Bind('endTime') LocalDateTime endTime)
 
 
-    @SqlUpdate('insert into play (play_time, song_id) values (:playTime, :songId)')
+    @SqlUpdate('insert into play (play_time, song_id, source_id) values (:playTime, :songId, :sourceId)')
     @GetGeneratedKeys
     Long create(@Bind('playTime') LocalDateTime playTime,
-                @Bind('songId') Long songId)
+                @Bind('songId') Long songId,
+                @Bind('sourceId') Long sourceId)
 
 }

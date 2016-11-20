@@ -1,5 +1,6 @@
 package com.whatplayed.modules
 
+import com.whatplayed.api.Source
 import groovy.util.logging.Slf4j
 import com.whatplayed.api.Artist
 import com.whatplayed.api.Play
@@ -31,12 +32,18 @@ class PlaylistModule {
     private static final String DATE_PATTERN = 'yyyy-MM-dd'
     private final PlayDAO playDAO
     private final PlaySummaryDAO playSummaryDAO
+    private final SourceModule sourceModule
     private final ArtistModule artistModule
     private final SongModule songModule
 
-    PlaylistModule(PlayDAO playDAO, PlaySummaryDAO playSummaryDAO, ArtistModule artistModule, SongModule songModule) {
+    PlaylistModule(PlayDAO playDAO,
+                   PlaySummaryDAO playSummaryDAO,
+                   SourceModule sourceModule,
+                   ArtistModule artistModule,
+                   SongModule songModule) {
         this.playDAO = playDAO
         this.playSummaryDAO = playSummaryDAO
+        this.sourceModule = sourceModule
         this.artistModule = artistModule
         this.songModule = songModule
     }
@@ -46,6 +53,10 @@ class PlaylistModule {
     }
 
     List<PlaySummary> getTopPlays(TopPlaysRequest request) {
+        if (request.sourceId) {
+            return playSummaryDAO.findTopPlaysBetween(request.sourceId, request.rangeStartTime, request.rangeEndTime,
+                    request.limit, request.offset)
+        }
         return playSummaryDAO.findTopPlaysBetween(request.rangeStartTime, request.rangeEndTime,
                 request.limit, request.offset)
     }
@@ -116,6 +127,8 @@ class PlaylistModule {
             return []
         }
 
+        Source source = sourceModule.findSourceByName('The Current')
+
         List<Play> parsedPlays = []
         ListIterator<Element> iterator = songRows.listIterator()
         DateTimeFormatter formatter = DateTimeFormat.forPattern('yyyy-MM-dd H:mm')
@@ -159,7 +172,7 @@ class PlaylistModule {
             if (playTime.toDateTime(SOURCE_TIME_ZONE) >= currentHourStart) {
                 Song song = getOrCreateSong(artistName, songTitle)
                 Play play = new Play(song: song, playTime: playTime)
-                play.id = playDAO.create(playTime, song.id)
+                play.id = playDAO.create(playTime, song.id, source.id)
                 parsedPlays << play
             }
         }

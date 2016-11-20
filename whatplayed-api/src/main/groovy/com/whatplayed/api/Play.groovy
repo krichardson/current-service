@@ -6,6 +6,7 @@ class Play {
 
     Long id
     Song song
+    Source source
     LocalDateTime playTime
 
 }

@@ -18,6 +18,29 @@ public interface PlaySummaryDAO {
             on p.song_id = s.id
         join artist a
             on s.artist_id = a.id
+    where p.source_id = :sourceId
+        and p.play_time >= :startTime
+        and p.play_time <= :endTime
+    group by a.id, a.name, s.id, s.title
+            order by count(1) desc, artist_name asc, song_title asc
+            limit :limit
+            offset :offset
+    ''')
+    List<PlaySummary> findTopPlaysBetween(@Bind('sourceId') Long sourceId,
+                                          @Bind('startTime') LocalDateTime startTime,
+                                          @Bind('endTime') LocalDateTime endTime,
+                                          @Bind('limit') Integer limit,
+                                          @Bind('offset') Integer offset)
+
+    @SqlQuery('''
+    select a.id as artist_id, a.name as artist_name,
+    s.id as song_id, s.title as song_title,
+    count(1) as plays, min(p.play_time) as earliest_play_time, max(p.play_time) as latest_play_time
+    from play p
+        join song s
+            on p.song_id = s.id
+        join artist a
+            on s.artist_id = a.id
     where p.play_time >= :startTime
             and p.play_time <= :endTime
     group by a.id, a.name, s.id, s.title

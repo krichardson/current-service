@@ -3,6 +3,7 @@ package com.whatplayed.modules
 import com.whatplayed.api.Artist
 import com.whatplayed.api.Play
 import com.whatplayed.api.Song
+import com.whatplayed.api.Source
 import com.whatplayed.dao.PlayDAO
 import com.whatplayed.dao.PlaySummaryDAO
 import org.joda.time.DateTime
@@ -13,6 +14,7 @@ class PlaylistModuleSpec extends Specification {
 
     PlayDAO playDAO
     PlaySummaryDAO playSummaryDAO
+    SourceModule sourceModule
     ArtistModule artistModule
     SongModule songModule
     PlaylistModule playlistModule
@@ -20,16 +22,17 @@ class PlaylistModuleSpec extends Specification {
     def setup() {
         playDAO = Mock()
         playSummaryDAO = Mock()
+        sourceModule = Mock()
         artistModule = Mock()
         songModule = Mock()
-        playlistModule = new PlaylistModule(playDAO, playSummaryDAO, artistModule, songModule)
+        playlistModule = new PlaylistModule(playDAO, playSummaryDAO, sourceModule, artistModule, songModule)
     }
 
     def 'parse play data from an html document'() {
         setup: 'A known html file'
         DateTime playHour = new DateTime(2011, 01, 16, 19, 0)
         String html = this.getClass().getResource('/fixtures/playlist.html').text
-
+        Source source = new Source(id: 1, name: 'The Current')
         Artist artist1 = new Artist(id: 1, name: 'James Buckley Trio')
         Song song1 = new Song(id: 1, artist: artist1, title: 'What\'s Yours')
         Artist artist2 = new Artist(id: 2, name: 'Gay Beast')
@@ -39,13 +42,14 @@ class PlaylistModuleSpec extends Specification {
         List<Play> playList = playlistModule.parseHtml(html, playHour)
 
         then:
+        _ * sourceModule.findSourceByName('The Current') >> source
         1 * artistModule.findOrCreateArtist(artist1.name) >> artist1
         1 * songModule.findOrCreateSong(artist1, song1.title) >> song1
-        1 * playDAO.create(_ as LocalDateTime, _ as Long)
+        1 * playDAO.create(_ as LocalDateTime, _ as Long, 1)
 
         1 * artistModule.findOrCreateArtist(artist2.name) >> artist2
         1 * songModule.findOrCreateSong(artist2, song2.title) >> song2
-        1 * playDAO.create(_ as LocalDateTime, _ as Long)
+        1 * playDAO.create(_ as LocalDateTime, _ as Long, 1)
 
         assert playList.size() == 2
         assert playList[0].playTime == playHour.withMinuteOfHour(56).toLocalDateTime()

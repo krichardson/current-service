@@ -23,6 +23,7 @@ ruleset {
     ruleset('rulesets/groovyism.xml')
     ruleset('rulesets/imports.xml') {
         'MisorderedStaticImports' enabled: false
+        'NoWildcardImports' enabled: false
     }
     ruleset('rulesets/jdbc.xml')
     ruleset('rulesets/junit.xml')

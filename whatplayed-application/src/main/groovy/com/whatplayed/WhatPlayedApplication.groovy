@@ -3,6 +3,9 @@ package com.whatplayed
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.joda.JodaModule
+import com.whatplayed.dao.SourceDAO
+import com.whatplayed.modules.SourceModule
+import com.whatplayed.resources.SourceResource
 import io.dropwizard.Application
 import io.dropwizard.db.DataSourceFactory
 import io.dropwizard.servlets.tasks.Task
@@ -77,6 +80,7 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
         jdbi.registerMapper(new JodaLocalDateTimeMapper())
 
         //DOAs
+        SourceDAO sourceDAO = jdbi.onDemand(SourceDAO)
         ArtistDAO artistDAO = jdbi.onDemand(ArtistDAO)
         SongDAO songDAO = jdbi.onDemand(SongDAO)
         ChartDAO chartDAO = jdbi.onDemand(ChartDAO)
@@ -85,14 +89,17 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
         PlaySummaryDAO playSummaryDAO = jdbi.onDemand(PlaySummaryDAO)
 
         //Modules
+        SourceModule sourceModule = new SourceModule(sourceDAO)
         ArtistModule artistModule = new ArtistModule(artistDAO)
         SongModule songModule = new SongModule(songDAO)
         ChartModule chartModule = new ChartModule(chartDAO, placementDAO, artistModule, songModule)
-        PlaylistModule playlistModule = new PlaylistModule(playDAO, playSummaryDAO, artistModule, songModule)
+        PlaylistModule playlistModule = new PlaylistModule(
+                playDAO, playSummaryDAO, sourceModule, artistModule, songModule)
 
         //Tasks
         Task playlistTask = new PlaylistTask(playlistModule)
 
+        environment.jersey().register(new SourceResource(sourceModule))
         environment.jersey().register(new ChartResource(chartModule))
         environment.jersey().register(new ArtistResource(artistModule))
         environment.jersey().register(new PlaylistResource(playlistModule))

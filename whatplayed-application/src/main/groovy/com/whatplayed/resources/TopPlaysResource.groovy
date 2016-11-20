@@ -14,13 +14,14 @@ import org.joda.time.LocalDateTime
 import javax.ws.rs.DefaultValue
 import javax.ws.rs.GET
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
-@Path('/topplays')
+@Path('/sources/{sourceId}/topplays')
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = 'Top Plays')
 class TopPlaysResource {
@@ -35,12 +36,26 @@ class TopPlaysResource {
     @GET
     @Timed
     @ApiOperation(value = 'Get the top plays for a specified time range')
-    TopPlaysResponse plays(@QueryParam('rangeStartTime') DateTimeParam rangeStartTime,
+    TopPlaysResponse plays(@PathParam('sourceId') String sourceIdOrAll,
+                           @QueryParam('rangeStartTime') DateTimeParam rangeStartTime,
                            @QueryParam('rangeEndTime') DateTimeParam rangeEndTime,
                            @QueryParam('limit') @DefaultValue('20') IntParam limit,
                            @QueryParam('offset') @DefaultValue('0') IntParam offset) {
 
+        Long sourceId = null
+        if (sourceIdOrAll != 'all') {
+            try {
+                sourceId = Long.parseLong(sourceIdOrAll)
+            } catch (NumberFormatException e) {
+                throw new WebApplicationException(
+                        Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                                .entity('sourceId must be numeric or "all"')
+                                .build())
+            }
+        }
+
         TopPlaysRequest request = new TopPlaysRequest(
+                sourceId: sourceId,
                 rangeStartTime: new LocalDateTime(rangeStartTime.get()),
                 rangeEndTime: new LocalDateTime(rangeEndTime.get()),
                 limit: limit.get(),

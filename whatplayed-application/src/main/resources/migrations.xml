@@ -127,6 +127,47 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
         </createIndex>
     </changeSet>
 
+    <changeSet id="create_source_table" author="kris">
+        <createTable tableName="source">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add the Current as a Source -->
+        <sql>
+            INSERT INTO source (name) VALUES ('The Current');
+        </sql>
+
+        <!-- Add the source_id column to the Plays table -->
+        <addColumn tableName="play">
+            <column name="source_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseColumnNames="source_id"
+                                 baseTableName="play"
+                                 constraintName="fk_play_source"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="source"/>
+
+
+        <!-- Populate any existing plays with the current source_id -->
+        <sql>
+            UPDATE play
+            SET source_id = (SELECT id FROM source WHERE name = 'The Current');
+        </sql>
+
+        <!-- Now that it's populated, add non null constraint to source id -->
+        <addNotNullConstraint tableName="play" columnName="source_id" />
+
+    </changeSet>
+
 
 
 </databaseChangeLog>
