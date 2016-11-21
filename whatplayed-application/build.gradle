@@ -70,21 +70,6 @@ runShadow {
     args 'server', 'config.yml'
 }
 
-/*
-task ('run', type: JavaExec, dependsOn: 'shadowJar', group: 'dropwizard',  description: "Run service using dev configuration") {
-    main = '-jar'
-    args = ["${project.tasks.shadowJar.archivePath}", 'server', 'config.yml']
-    systemProperties = project.ext.properties.findAll { it.key.startsWith('dw') }
-}
-
-task ('debug', type: JavaExec, dependsOn: 'shadowJar', group: "dropwizard", description: "Run/debug service using dev configuration") {
-    main = '-jar'
-    debug = true
-    args = ["${project.tasks.shadowJar.archivePath}", 'server', 'config.yml']
-    systemProperties = project.ext.properties.findAll { it.key.startsWith('dw') }
-}
-*/
-
 task ('migrate', type: JavaExec, dependsOn: 'shadowJar', group: 'dropwizard', description: "Run migrations using the dev configuration") {
     main = '-jar'
     args = ["${project.tasks.shadowJar.archivePath}", 'db', 'migrate', 'config.yml']
