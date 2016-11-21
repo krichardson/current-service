@@ -7,16 +7,16 @@ database:
 
   # the username
   #user: sa
-  user: postgres
+  user: ${env.DB_USER!'postgres'}
 
   # the password
   #password: sa
-  password:
+  password: ${env.DB_PASSWORD!''}
 
   # the JDBC URL
   #url: jdbc:h2:current
   #url: jdbc:postgresql://127.0.0.1:5432/current
-  url: jdbc:postgresql://localhost:32768/current
+  url: jdbc:postgresql://${env.DB_HOST!'localhost'}:${env.DB_PORT!'32768'}/${env.DB_NAME!'current'}
 
 server:
   applicationConnectors:

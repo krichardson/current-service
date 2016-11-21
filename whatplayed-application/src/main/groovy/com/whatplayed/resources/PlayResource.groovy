@@ -1,6 +1,7 @@
 package com.whatplayed.resources
 
 import com.codahale.metrics.annotation.Timed
+import com.whatplayed.api.PlayRequest
 import com.whatplayed.api.Source
 import com.whatplayed.modules.SourceModule
 import io.dropwizard.jersey.params.DateTimeParam
@@ -15,8 +16,10 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue
 import org.joda.time.LocalDateTime
 import org.joda.time.Period
 
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.ws.rs.GET
+import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
@@ -75,6 +78,26 @@ class PlayResource extends AbstractSourceResource {
                 playCount: playList.size(),
                 playList: playList,
         )
+    }
+
+    @GET
+    @Path('/latest')
+    @Timed
+    @ApiOperation(value = 'Get the most recent play for the source')
+    Play getLatestPlay(@PathParam('sourceId') LongParam sourceId) {
+        Source source = getSource(sourceId.get())
+        return playModule.getMostRecentPlay(source)
+    }
+
+    @POST
+    @Timed
+    @ApiOperation(value = 'Record a play for the source')
+    Play recordPlay(@PathParam('sourceId') LongParam sourceId,
+                    @Valid PlayRequest playRequest) {
+
+        Source source = getSource(sourceId.get())
+        playModule.recordPlay(source, playRequest)
+
     }
 
 }

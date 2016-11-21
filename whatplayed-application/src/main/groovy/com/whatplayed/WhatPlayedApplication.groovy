@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule
 import com.whatplayed.dao.SourceDAO
 import com.whatplayed.modules.SourceModule
 import com.whatplayed.resources.SourceResource
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle
 import io.dropwizard.Application
 import io.dropwizard.db.DataSourceFactory
 import io.dropwizard.servlets.tasks.Task
@@ -61,6 +62,7 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
         bootstrap.with {
             addBundle migrationsBundle
             addBundle swaggerBundle
+            bootstrap.addBundle new TemplateConfigBundle()
         }
     }
 

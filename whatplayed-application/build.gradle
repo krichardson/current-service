@@ -34,11 +34,12 @@ dependencies {
     compile "${dropwizardGroup}:dropwizard-client:${dropwizardVersion}"
     compile "${dropwizardGroup}:dropwizard-views:${dropwizardVersion}"
     compile "com.smoketurner:dropwizard-swagger:1.0.0-1"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.7.8"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:${jacksonVersion}"
+    compile "de.thomaskrille:dropwizard-template-config:1.2.0"
 
     compile 'org.postgresql:postgresql:9.3-1101-jdbc4'
     compile 'org.jsoup:jsoup:1.10.1'
-    compile 'com.github.scribejava:scribejava-apis:3.2.0'
+    //compile 'com.github.scribejava:scribejava-apis:3.2.0'
 
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
 
