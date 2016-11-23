@@ -1,3 +1,5 @@
+[ ![Codeship Status for krichardson/whatplayed](https://app.codeship.com/projects/942ca740-93fb-0134-7662-426698f4d6ff/status?branch=master)](https://app.codeship.com/projects/186544)
+
 # Introduction
 
 This is a service for gathering and archiving song play data
