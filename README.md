@@ -1,5 +1,3 @@
-[ ![Codeship Status for krichardson/whatplayed](https://app.codeship.com/projects/942ca740-93fb-0134-7662-426698f4d6ff/status?branch=master)](https://app.codeship.com/projects/186544)
-
 # Introduction
 
 This is a service for gathering and archiving song play data
@@ -36,13 +34,9 @@ things.
 
 ## Playlist data import 
 
-There is a dropwizard task for importing playlist data. You likely want to schedule something to execute
-this task at periodic intervals. By default the task will import up to a month of data from the time of
-the last imported play
-
-The task is accessible over http on the admin port:
-
-        e.g., curl -X POST http://localhost:8081/tasks/playlist
+The `import-current` project builds a Docker container that runs an import job. It makes calls
+to the `whatplayed-application`, so that needs to be running in order for the import job to run
+successfully
 
 ## Chart data import
 

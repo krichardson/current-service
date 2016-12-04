@@ -84,7 +84,7 @@ interface PlayDAO {
             and p.play_time = :playTime
     ''')
     Play findPlayByTime(@Bind('sourceId') Long sourceId,
-                        @Bind('startTime') LocalDateTime playTime)
+                        @Bind('playTime') LocalDateTime playTime)
 
 
     @SqlUpdate('insert into play (play_time, song_id, source_id) values (:playTime, :songId, :sourceId)')

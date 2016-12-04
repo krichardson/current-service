@@ -1,4 +1,4 @@
-package com.whatplayed.current
+package com.whatplayed.current.service
 
 import com.whatplayed.api.Play
 import com.whatplayed.api.PlayRequest
@@ -8,14 +8,14 @@ import retrofit2.Call
 import retrofit2.Response
 import spock.lang.Specification
 
-class ImportHandlerSpec extends Specification {
+class ImportServiceSpec  extends Specification {
 
-    private ImportHandler handler
+    private ImportService service
     private PlayApi playApi
 
     void setup() {
         playApi = Mock()
-        handler = new ImportHandler(playApi)
+        service = new ImportService(playApi)
     }
 
     def 'parse play data from an html document'() {
@@ -32,7 +32,7 @@ class ImportHandlerSpec extends Specification {
         Response<Play> playResponse = GroovyMock()
 
         when: 'Parsing the chart data out of the html'
-        handler.parseHtml(html, playHour)
+        service.parseHtml(html, playHour)
 
         then:
         2 * playApi.recordPlay(1, { PlayRequest p ->
@@ -53,7 +53,7 @@ class ImportHandlerSpec extends Specification {
         String html = this.getClass().getResource('/fixtures/playlist_nodata.html').text
 
         when: 'Parsing the chart data out of the html'
-        List<Play> playList = handler.parseHtml(html, playHour)
+        List<Play> playList = service.parseHtml(html, playHour)
 
         then:
         assert playList.size() == 0
@@ -65,7 +65,7 @@ class ImportHandlerSpec extends Specification {
         String html = this.getClass().getResource('/fixtures/playlist_empty_artist.html').text
 
         when: 'Parsing the chart data out of the html'
-        List<Play> playList = handler.parseHtml(html, playHour)
+        List<Play> playList = service.parseHtml(html, playHour)
 
         then:
         assert playList.size() == 0
@@ -77,7 +77,7 @@ class ImportHandlerSpec extends Specification {
         String html = this.getClass().getResource('/fixtures/playlist_empty_title.html').text
 
         when: 'Parsing the chart data out of the html'
-        List<Play> playList = handler.parseHtml(html, playHour)
+        List<Play> playList = service.parseHtml(html, playHour)
 
         then:
         assert playList.size() == 0

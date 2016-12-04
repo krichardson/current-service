@@ -1,14 +1,9 @@
-package com.whatplayed.current
+package com.whatplayed.current.service
 
-import com.amazonaws.services.lambda.runtime.Context
-import com.amazonaws.services.lambda.runtime.RequestHandler
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.whatplayed.api.Play
 import com.whatplayed.api.PlayRequest
 import com.whatplayed.client.PlayApi
-import com.whatplayed.client.configure.ClientConfiguration
-import com.whatplayed.client.configure.ObjectMapperBuilder
-import com.whatplayed.client.configure.RetrofitBuilder
+import groovy.util.logging.Slf4j
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDateTime
@@ -23,47 +18,34 @@ import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 
 @SuppressWarnings('Println')
 @SuppressWarnings('PrivateFieldCouldBeFinal')
-class ImportHandler implements RequestHandler<ImportRequest, ImportResponse> {
+@Slf4j
+class ImportService {
 
-    private static final Long SOURCE_ID = 1
-    private static final LocalDateTime EARLIEST_START_DATE = new LocalDateTime(2011, 1, 1, 0, 0)
+
+    public static final DateTimeZone SOURCE_TIME_ZONE = DateTimeZone.forID('America/Chicago')
+
     private static final int CONNECT_TIMEOUT_MILLIS = 8000
-    private static final DateTimeZone SOURCE_TIME_ZONE = DateTimeZone.forID('America/Chicago')
+    private static final Long SOURCE_ID = 1
     private static final String DATE_PATTERN = 'yyyy-MM-dd'
+    private final PlayApi playApi
 
-    private static PlayApi playApi = null
-
-    ImportHandler() {
-        String baseUrl = System.getenv('WHATPLAYED_SERVICE_URL')
-        ClientConfiguration clientConfiguration = new ClientConfiguration(baseUrl: baseUrl)
-        ObjectMapper objectMapper = new ObjectMapperBuilder().build()
-        Retrofit retrofit = new RetrofitBuilder(clientConfiguration).withObjectMapper(objectMapper).build()
-        playApi = retrofit.create(PlayApi)
-    }
-
-    ImportHandler(final PlayApi playApi) {
+    ImportService(final PlayApi playApi) {
         this.playApi = playApi
     }
 
-    @Override
-    ImportResponse handleRequest(ImportRequest input, Context context) {
-
-        //Find the last import
-        LocalDateTime lastImport = findLastImportTime() ?: EARLIEST_START_DATE
-
-        //Add a second, so we don't try to re-import the last song
-        //Also need to use a DateTime so DST is considered
-        DateTime importStartTime = lastImport.toDateTime(SOURCE_TIME_ZONE).plusSeconds(1)
-        List<Play> playsImported = importPlaylist(importStartTime)
-        return new ImportResponse(playsImported: playsImported)
-
+    LocalDateTime findLastImportTime() {
+        Call<Play> latestPlayCall = playApi.getLatestPlay(SOURCE_ID)
+        Response<Play> latestPlayResponse = latestPlayCall.execute()
+        if (latestPlayResponse.successful) {
+            return latestPlayResponse.body()?.playTime
+        }
+        return null
     }
 
-    static List<Play> importPlaylist(DateTime startTime) {
+    List<Play> importPlaylist(DateTime startTime) {
         //Don't do more than a month at a time
         DateTime endTime = new DateTime()
         if (startTime.plusMonths(1) < endTime) {
@@ -77,7 +59,7 @@ class ImportHandler implements RequestHandler<ImportRequest, ImportResponse> {
             try {
                 playsImported.addAll parseUrl(dataUrl, currentHour)
             } catch (IOException e) {
-                println "Unable to fetch data form ${dataUrl}"
+                println "Unable to fetch data form ${dataUrl}: ${e.message}"
             }
             //For any non-first hour, set to the start of the hour
             currentHour = currentHour
@@ -89,7 +71,13 @@ class ImportHandler implements RequestHandler<ImportRequest, ImportResponse> {
         return playsImported
     }
 
-    static List<Play> parseUrl(String url, DateTime currentHour, Boolean retry = true) {
+    protected List<Play> parseHtml(String html, DateTime currentHour) {
+        Document doc = Jsoup.parse(html)
+        return parseDocument(doc, currentHour)
+    }
+
+    private List<Play> parseUrl(String url, DateTime currentHour, Boolean retry = true) {
+        log.info "Fetching play data from ${url}"
         Document doc
         try {
             Connection connection = Jsoup.connect(url).timeout(CONNECT_TIMEOUT_MILLIS)
@@ -105,12 +93,7 @@ class ImportHandler implements RequestHandler<ImportRequest, ImportResponse> {
 
     }
 
-    static List<Play> parseHtml(String html, DateTime currentHour) {
-        Document doc = Jsoup.parse(html)
-        return parseDocument(doc, currentHour)
-    }
-
-    private static List<Play> parseDocument(Document doc, DateTime currentHourStart) {
+    private List<Play> parseDocument(Document doc, DateTime currentHourStart) {
         Elements songRows = doc.select('article.song')
         if (songRows.size() == 1 && songRows.html().contains('No playlist data available for this hour.')) {
             return []
@@ -151,6 +134,7 @@ class ImportHandler implements RequestHandler<ImportRequest, ImportResponse> {
                         .withHourOfDay(currentHourStart.hourOfDay)
                         .withMinuteOfHour(minute)
             } catch (IllegalArgumentException e) {
+                log.debug("Unable to parse time: ${e.message}")
                 playTime = currentHourStart.toLocalDateTime()
             }
 
@@ -195,14 +179,5 @@ class ImportHandler implements RequestHandler<ImportRequest, ImportResponse> {
 
     private static String elementAttributeValue(Element element, String attributeName) {
         return element.attr(attributeName).trim()
-    }
-
-    private LocalDateTime findLastImportTime() {
-        Call<Play> latestPlayCall = playApi.getLatestPlay(SOURCE_ID)
-        Response<Play> latestPlayResponse = latestPlayCall.execute()
-        if (latestPlayResponse.successful) {
-            return latestPlayResponse.body()?.playTime
-        }
-        return null
     }
 }

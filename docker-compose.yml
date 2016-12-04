@@ -1,0 +1,29 @@
+version: "2"
+services:
+  api:
+    image: com.whatplayed/whatplayed-application:latest
+    ports:
+      - "8080:8080"
+    links:
+      - db
+    environment:
+      DB_HOST: "db"
+      DB_PORT: "5432"
+      DB_NAME: "whatplayed"
+      DB_USER: "postgres"
+      DB_PASSWORD: ""
+#  import-current:
+#    image: com.whatplayed/import-current:latest
+#    links:
+#      - api
+#    environment:
+#      WHATPLAYED_APP_URL: "http://api:8080"
+  db:
+    image: postgres:latest
+    ports:
+      - "5432"
+    volumes:
+      - postgres-db-volume:/Users/kris/postgresql/data
+volumes:
+    postgres-db-volume:
+        driver: local
