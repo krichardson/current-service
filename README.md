@@ -30,6 +30,26 @@ things.
 
         gradle runShadow
 
+# Build and publich the docker images
+
+1. Build the jars
+
+        ./gradlew shadowJar
+    
+2. Login to docker
+
+        aws ecr get-login --region us-west-2
+    
+3. Build and deploy the application
+
+        docker build -t com.whatplayed/whatplayed-application:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest .
+        docker push 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest
+
+4. Build and deploy the import job
+
+        docker build -t com.whatplayed/whatplayed-application:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/import-current:latest .
+        docker push 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/import-current:latest
+
 # Using the Application
 
 ## Playlist data import 
@@ -47,6 +67,8 @@ To import a chart, the url and date of the chart has to be provided to the endpo
             "chartDate":"2014-06-11",
             "chartUrl":"http://www.thecurrent.org/feature/2014/06/11/chart-show"
         }
+        
+       
 
 
 

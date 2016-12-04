@@ -22,9 +22,6 @@ class Application {
             throw new MissingArgumentException('Must provide the WhatPlayed service url as the first argument')
         }
 
-        //Wait for service to become available
-        sleep(20000)
-
         new Application().run(args[0].trim())
     }
 
