@@ -42,12 +42,14 @@ things.
     
 3. Build and deploy the application
 
-        docker build -t com.whatplayed/whatplayed-application:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest .
+        docker build -t com.whatplayed/whatplayed-application -f whatplayed-application/docker/Dockerfile .
+        docker tag com.whatplayed/whatplayed-application:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest
         docker push 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest
 
 4. Build and deploy the import job
 
-        docker build -t com.whatplayed/whatplayed-application:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/import-current:latest .
+        docker build -t com.whatplayed/import-current -f import-current/docker/Dockerfile .
+        docker tag com.whatplayed/import-current:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/import-current:latest
         docker push 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/import-current:latest
 
 # Using the Application
