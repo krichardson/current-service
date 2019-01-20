@@ -1,17 +1,19 @@
-version: "2"
+version: '3'
 services:
+
   api:
     image: com.whatplayed/whatplayed-application:latest
     ports:
       - "8080:8080"
-    links:
-      - db
+      - "8081:8081"
     environment:
-      DB_HOST: "db"
+      DB_HOST: "db_1"
       DB_PORT: "5432"
       DB_NAME: "whatplayed"
-      DB_USER: "postgres"
-      DB_PASSWORD: ""
+      DB_USER: "app_user"
+      DB_PASSWORD: "app_pass"
+    depends_on:
+      - db
 #  import-current:
 #    image: com.whatplayed/import-current:latest
 #    links:
@@ -19,11 +21,16 @@ services:
 #    environment:
 #      WHATPLAYED_APP_URL: "http://api:8080"
   db:
-    image: postgres:latest
+    image: postgres:10.4-alpine
     ports:
-      - "5432"
+      - "5432:5432"
     volumes:
-      - postgres-db-volume:/Users/kris/postgresql/data
+      - postgres-db-volume:/Users/kris/postgresql/whatplayed_data
+      - "./whatplayed-service/src/main/resources/db/init/init_db.sql:/docker-entrypoint-initdb.d/_init_db.sql"
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRESS_PASSWORD: app_pass
+
 volumes:
     postgres-db-volume:
         driver: local

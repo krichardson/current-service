@@ -1,14 +1,8 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-    }
+plugins {
+    id "com.github.johnrengelman.shadow" version "4.0.2"
+    id "groovy"
 }
 
-apply plugin: 'groovy'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply from: rootProject.file('gradle/codenarc.gradle')
 apply from: rootProject.file('gradle/test.gradle')
 

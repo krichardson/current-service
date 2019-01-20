@@ -4,7 +4,7 @@ MAINTAINER Kris Richardson <kris@koncise.net>
 
 # Add the application files
 RUN mkdir /opt/whatplayed
-ADD import-current/build/libs/import-current-all.jar /opt/whatplayed/import-current.jar
+ADD import-current/build/libs/import-current.jar /opt/whatplayed/
 
 # Volume for logging
 VOLUME ["/var/log/app"]

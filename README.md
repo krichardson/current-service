@@ -10,25 +10,25 @@ things.
 
 * To run the tests run:
 
-        gradle test
+        ./gradlew test
         
-        gradle test -Dtest.single=SampleSpec
+        ./gradlew test -Dtest.single=SampleSpec
 
 * To package the service run:
 
-        gradle shadowJar
+        ./gradlew shadowJar
 
 * To drop an existing database run:
 
-        gradle dropAll
+        ./gradlew dropAll
 
 * To setup the postgres database run:
 
-        gradle migrate
+        ./gradlew migrate
 
 * To run the server run:
 
-        gradle runShadow
+        ./gradlew runShadow
 
 # Build and publich the docker images
 
@@ -42,7 +42,7 @@ things.
     
 3. Build and deploy the application
 
-        docker build -t com.whatplayed/whatplayed-application -f whatplayed-application/docker/Dockerfile .
+        docker build -t com.whatplayed/whatplayed-application -f whatplayed-service/docker/Dockerfile .
         docker tag com.whatplayed/whatplayed-application:latest 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest
         docker push 846469724631.dkr.ecr.us-west-2.amazonaws.com/com.whatplayed/whatplayed-application:latest
 

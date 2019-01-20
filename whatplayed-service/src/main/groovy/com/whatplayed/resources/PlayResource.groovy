@@ -94,10 +94,8 @@ class PlayResource extends AbstractSourceResource {
     @ApiOperation(value = 'Record a play for the source')
     Play recordPlay(@PathParam('sourceId') LongParam sourceId,
                     @Valid PlayRequest playRequest) {
-
         Source source = getSource(sourceId.get())
         playModule.recordPlay(source, playRequest)
-
     }
 
 }

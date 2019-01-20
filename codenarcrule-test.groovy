@@ -8,6 +8,7 @@ ruleset {
     ruleset('rulesets/concurrency.xml')
     ruleset('rulesets/convention.xml') {
         'NoDef' enabled: false
+        'MethodReturnTypeRequired' enabled: false
     }
     ruleset('rulesets/design.xml') {
         'AbstractClassWithoutAbstractMethod' enabled: false
@@ -28,7 +29,7 @@ ruleset {
         'NoWildcardImports' enabled: false
     }
     ruleset('rulesets/jdbc.xml')
-    ruleset('rulesets/junit.xml')
+    //ruleset('rulesets/junit.xml')
     ruleset('rulesets/logging.xml')
     ruleset('rulesets/naming.xml') {
         'FactoryMethodName' enabled: false

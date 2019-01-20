@@ -25,7 +25,6 @@ class PlaylistResourceSpec extends Specification {
     }
 
     def "making a request without date ranges defaults to last 24 hours"() {
-
         setup:
         String sourceId = '1'
         Source source = new Source(id: 1)
@@ -53,7 +52,6 @@ class PlaylistResourceSpec extends Specification {
     }
 
     def "Making a request with just a start time defaults the end time to 24 hours later"() {
-
         setup:
         String sourceId = '1'
         Source source = new Source(id: 1)
@@ -75,7 +73,6 @@ class PlaylistResourceSpec extends Specification {
     }
 
     def "Requesting more than 24 hours at once returns error"() {
-
         setup:
         LocalDateTime startTime = new LocalDateTime(2014, 1, 1, 12, 0)
         LocalDateTime endTime = startTime.plusHours(25)
@@ -90,7 +87,6 @@ class PlaylistResourceSpec extends Specification {
     }
 
     def "Start date must be before end date"() {
-
         setup:
         LocalDateTime startTime = new LocalDateTime(2014, 1, 1, 12, 0)
         LocalDateTime endTime = startTime.minusHours(1)
@@ -102,7 +98,6 @@ class PlaylistResourceSpec extends Specification {
         WebApplicationException exception = thrown()
         assert exception.response.status == HttpURLConnection.HTTP_BAD_REQUEST
         assert exception.response.entity == 'rangeEndTime must be later than rangeStartTime'
-
     }
 
 }

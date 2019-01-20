@@ -1,16 +1,9 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-    }
+plugins {
+    id "com.github.johnrengelman.shadow" version "4.0.2"
+    id "groovy"
+    id "application"
 }
 
-apply plugin: 'groovy'
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'application'
 apply from: rootProject.file('gradle/codenarc.gradle')
 apply from: rootProject.file('gradle/test.gradle')
 
@@ -37,7 +30,7 @@ dependencies {
     compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:${jacksonVersion}"
     compile "de.thomaskrille:dropwizard-template-config:1.2.0"
 
-    compile 'org.postgresql:postgresql:9.3-1101-jdbc4'
+    compile 'org.postgresql:postgresql:42.2.5'
     compile 'org.jsoup:jsoup:1.10.1'
 
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"

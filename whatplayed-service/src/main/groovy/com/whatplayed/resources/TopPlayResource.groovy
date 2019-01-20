@@ -30,8 +30,8 @@ import javax.ws.rs.core.Response
 @Api(value = 'Top Plays')
 class TopPlayResource extends AbstractSourceResource {
 
-    private final PlayModule playModule
     private static final Integer MAX_TOP_PLAYS = 100
+    private final PlayModule playModule
 
     TopPlayResource(final PlayModule playModule,
                     final SourceModule sourceModule) {
@@ -100,7 +100,6 @@ class TopPlayResource extends AbstractSourceResource {
                 request: request,
                 topPlays: topPlays,
         )
-
     }
 
 }

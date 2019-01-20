@@ -8,7 +8,7 @@ import retrofit2.Call
 import retrofit2.Response
 import spock.lang.Specification
 
-class ImportServiceSpec  extends Specification {
+class ImportServiceSpec extends Specification {
 
     private ImportService service
     private PlayApi playApi
@@ -44,7 +44,6 @@ class ImportServiceSpec  extends Specification {
         2 * playCall.execute() >> playResponse
         2 * playResponse.successful >> true
         2 * playResponse.body() >> new Play()
-
     }
 
     def 'Return empty list when there is no data for the hour'() {

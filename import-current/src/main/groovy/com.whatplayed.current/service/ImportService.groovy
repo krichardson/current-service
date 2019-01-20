@@ -76,6 +76,36 @@ class ImportService {
         return parseDocument(doc, currentHour)
     }
 
+    private static String buildHourUrl(DateTime hour) {
+        return 'http://www.thecurrent.org/playlist/' +
+                hour.toString(DATE_PATTERN) + '/' + hour.toString('H') +
+                '?isajax=1'
+    }
+
+    @SuppressWarnings('Instanceof')
+    private static String nodeValue(Node node) {
+        //Search for the first child node that contains text
+
+        if (node instanceof TextNode) {
+            return node.text().trim()
+        }
+
+        //Go through each of the children looking for the first TextNode
+        for (Node n : node.childNodes()) {
+            String val = nodeValue(n)
+            if (val) {
+                return val
+            }
+        }
+
+        //All children checked and no text nodes were found
+        return null
+    }
+
+    private static String elementAttributeValue(Element element, String attributeName) {
+        return element.attr(attributeName).trim()
+    }
+
     private List<Play> parseUrl(String url, DateTime currentHour, Boolean retry = true) {
         log.info "Fetching play data from ${url}"
         Document doc
@@ -90,7 +120,6 @@ class ImportService {
         }
 
         return parseDocument(doc, currentHour)
-
     }
 
     private List<Play> parseDocument(Document doc, DateTime currentHourStart) {
@@ -149,35 +178,5 @@ class ImportService {
             }
         }
         return plays
-    }
-
-    private static String buildHourUrl(DateTime hour) {
-        return 'http://www.thecurrent.org/playlist/' +
-                hour.toString(DATE_PATTERN) + '/' + hour.toString('H') +
-                '?isajax=1'
-    }
-
-    @SuppressWarnings('Instanceof')
-    private static String nodeValue(Node node) {
-        //Search for the first child node that contains text
-
-        if (node instanceof TextNode) {
-            return node.text().trim()
-        }
-
-        //Go through each of the children looking for the first TextNode
-        for (Node n : node.childNodes()) {
-            String val = nodeValue(n)
-            if (val) {
-                return val
-            }
-        }
-
-        //All children checked and no text nodes were found
-        return null
-    }
-
-    private static String elementAttributeValue(Element element, String attributeName) {
-        return element.attr(attributeName).trim()
     }
 }

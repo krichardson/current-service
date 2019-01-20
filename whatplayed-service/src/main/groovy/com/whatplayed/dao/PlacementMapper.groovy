@@ -12,8 +12,7 @@ import java.sql.SQLException
 @SuppressWarnings('JdbcResultSetReference')
 class PlacementMapper implements ResultSetMapper<Placement> {
 
-    public Placement map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-
+    Placement map(int index, ResultSet r, StatementContext ctx) throws SQLException {
         Artist artist = new Artist(
                 id: r.getLong('artist_id'),
                 name: r.getString('artist_name'),
@@ -28,7 +27,6 @@ class PlacementMapper implements ResultSetMapper<Placement> {
                 song: song,
         )
         return placement
-
     }
 
 }

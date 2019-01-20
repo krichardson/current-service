@@ -19,14 +19,12 @@ class RetrofitBuilder {
     }
 
     Retrofit build() {
-
         ObjectMapper om = this.objectMapper ?: new ObjectMapperBuilder().build()
         JacksonConverterFactory converterFactory = JacksonConverterFactory.create(om)
         new Retrofit.Builder()
                 .baseUrl(clientConfiguration.baseUrl)
                 .addConverterFactory(converterFactory)
                 .build()
-
     }
 
 }

@@ -43,7 +43,7 @@ class ChartModule {
         if (chart) {
             chart.placements = placementDAO.findAllByChartId(chart.id)
         }
-       return chart
+        return chart
     }
 
     Chart getChart(LocalDate chartDate) {
@@ -65,8 +65,13 @@ class ChartModule {
         return parseDocument(doc, chartDate)
     }
 
-    private Chart parseDocument(Document doc, LocalDate chartDate) {
+    @SuppressWarnings('Instanceof')
+    private static String tdValue(Element element) {
+        Node childNode = element.childNodes()[0]
+        return (childNode instanceof TextNode) ? childNode.text().trim() : null
+    }
 
+    private Chart parseDocument(Document doc, LocalDate chartDate) {
         Chart chart = findOrCreateChart(chartDate)
 
         //If the chart already exists w/ placements, then skip updating
@@ -109,12 +114,6 @@ class ChartModule {
             chart.id = chartDAO.create(chartDate)
         }
         return chart
-    }
-
-    @SuppressWarnings('Instanceof')
-    private static String tdValue(Element element) {
-        Node childNode = element.childNodes()[0]
-        return (childNode instanceof TextNode) ? childNode.text().trim() : null
     }
 
 }

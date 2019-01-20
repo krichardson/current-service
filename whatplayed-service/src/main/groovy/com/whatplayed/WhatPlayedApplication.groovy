@@ -38,17 +38,17 @@ import com.whatplayed.dao.jdbi.JodaLocalDateTimeMapper
 import org.skife.jdbi.v2.DBI
 
 class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         new WhatPlayedApplication().run(args)
     }
 
     private final MigrationsBundle<WhatPlayedConfiguration> migrationsBundle =
-        new MigrationsBundle<WhatPlayedConfiguration>() {
-            @Override
-            public DataSourceFactory getDataSourceFactory(WhatPlayedConfiguration configuration) {
-                return configuration.database
-            }
+            new MigrationsBundle<WhatPlayedConfiguration>() {
+        @Override
+        DataSourceFactory getDataSourceFactory(WhatPlayedConfiguration configuration) {
+            return configuration.database
         }
+    }
 
     private final SwaggerBundle<WhatPlayedConfiguration> swaggerBundle = new SwaggerBundle<WhatPlayedConfiguration>() {
         @Override
@@ -58,7 +58,7 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
     }
 
     @Override
-    public void initialize(Bootstrap<WhatPlayedConfiguration> bootstrap) {
+    void initialize(Bootstrap<WhatPlayedConfiguration> bootstrap) {
         bootstrap.with {
             addBundle migrationsBundle
             addBundle swaggerBundle
@@ -67,8 +67,8 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
     }
 
     @Override
-    public void run(WhatPlayedConfiguration configuration,
-                    Environment environment) throws ClassNotFoundException {
+    void run(WhatPlayedConfiguration configuration,
+             Environment environment) throws ClassNotFoundException {
 
         environment.objectMapper.registerModule(new JodaModule())
         environment.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -97,7 +97,6 @@ class WhatPlayedApplication extends Application<WhatPlayedConfiguration> {
         ChartModule chartModule = new ChartModule(chartDAO, placementDAO, artistModule, songModule)
         PlayModule playModule = new PlayModule(
                 playDAO, playSummaryDAO, sourceModule, artistModule, songModule)
-
         //Tasks
         Task playlistTask = new PlaylistTask(playModule)
 

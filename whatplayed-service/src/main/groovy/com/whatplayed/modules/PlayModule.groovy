@@ -52,7 +52,6 @@ class PlayModule {
     }
 
     Play recordPlay(Source source, PlayRequest request) {
-
         //Check if the source already has a play recorded for that time
         Play play = playDAO.findPlayByTime(source.id, request.playTime)
         if (play) {
@@ -62,7 +61,6 @@ class PlayModule {
         Song song = getOrCreateSong(request.artistName, request.songTitle)
         Long playId = playDAO.create(request.playTime, song.id, source.id)
         return new Play(id: playId, song: song, source: source, playTime: request.playTime)
-
     }
 
     private Song getOrCreateSong(String artistName, String songTitle) {

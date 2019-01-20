@@ -36,7 +36,6 @@ class ChartResource {
     @Timed
     @ApiOperation(value = 'Get a list of charts')
     List<Chart> getCharts(@QueryParam('chartDate') Optional<DateTimeParam> chartDate) {
-
         if (chartDate.isPresent()) {
             return [chartModule.getChart(new LocalDate(chartDate.get().get()))]
         }
